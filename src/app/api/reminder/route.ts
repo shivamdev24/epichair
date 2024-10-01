@@ -5,7 +5,7 @@ import db from "@/utils/db";
 
 db();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
    // Assuming you pass userId as a query parameter
 
   const reminders = await Reminder.find();
