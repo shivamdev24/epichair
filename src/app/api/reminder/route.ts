@@ -13,10 +13,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { _id, title, date, message } = await request.json();
+  const {  title, date, message } = await request.json();
 
-  const reminder = new Reminder.findById({ _id });
-  const newreminder = new Reminder.reminder({ title, date, message });
+  const newreminder = new Reminder({ title, date, message });
   await newreminder.save();
   return NextResponse.json(newreminder, { status: 201 });
 }
