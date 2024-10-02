@@ -23,7 +23,7 @@ export const getDataFromToken = (
       token,
       process.env.TOKEN_SECRET!
     ) as DecodedToken;
-
+console.log(token);
     // Return the decoded user ID or other data as needed
     return decodedToken.id; // Adjust based on your payload structure
   } catch (error) {

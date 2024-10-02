@@ -2,62 +2,49 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "JWT_SECRET";
-
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get("token")?.value || "";
 
-  const isDashboardPath = path.startsWith("/dashboard");
+  // Log the path and token for debugging
+  console.log("Path:", path);
+  console.log("Token:", token);
 
-  if (isDashboardPath) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/admin/login", request.nextUrl));
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY!);
+    const userRole = (decodedToken as any).role;
+
+    // Log user role for debugging
+    console.log("User Role:", userRole);
+
+    // Role-based access checks
+    if (path.startsWith("/admin") && userRole !== "admin") {
+      return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
 
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const decodedToken: any = jwt.verify(token, SECRET_KEY);
-      const userRole = decodedToken.role;
-
-      // Define role-based access logic
-      if (path.startsWith("/admin") && userRole !== "admin") {
-        return NextResponse.redirect(
-          new URL("/login", request.nextUrl)
-        );
-      }
-
-      if (
-        path.startsWith("/staff") &&
-        !["staff"].includes(userRole)
-      ) {
-        return NextResponse.redirect(
-          new URL("/login", request.nextUrl)
-        );
-      }
-
-      if (
-        path.startsWith("/user") &&
-        !(
-          userRole === "user" 
-         
-        )
-      ) {
-        return NextResponse.redirect(
-          new URL("/login", request.nextUrl)
-        );
-      }
-
-      // Add more role-based access checks as needed...
-    } catch (error) {
-      console.log(error)
-      return NextResponse.redirect(new URL("/", request.nextUrl));
+    if (path.startsWith("/staff") && userRole !== "staff") {
+      return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
+
+    if (path.startsWith("/user") && userRole !== "user") {
+      return NextResponse.redirect(new URL("/login", request.nextUrl));
+    }
+  } catch (error) {
+    console.error("JWT verification error:", error);
+    return NextResponse.redirect(new URL("/login", request.nextUrl));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/user/:path*", "/staff/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/user/:path*",
+    "/staff/:path*",
+  ],
 };

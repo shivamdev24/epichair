@@ -125,7 +125,7 @@ export const sendEmail = async ({
         : "Reset Your Password";
 
     const htmlContent = `
-      <p>your ${emailType} otp is ${otp}
+      <p>your ${emailType} is ${otp} expiry time for OTP 10 minutes
       </p>`;
 
     const mailOptions = {

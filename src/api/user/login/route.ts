@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (!otp) {
       // Generate OTP
       const generatedOtp = generateOtp();
-      const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
+      const otpExpiry = getOtpExpiry(15); // Set expiry time for 10 minutes
 
       // Update user with the OTP and expiry
       await User.findByIdAndUpdate(user._id, {
