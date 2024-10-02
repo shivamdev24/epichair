@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const decodedToken: any = jwt.verify(token, SECRET_KEY);
       const userRole = decodedToken.role;
 
@@ -49,6 +50,7 @@ export async function middleware(request: NextRequest) {
 
       // Add more role-based access checks as needed...
     } catch (error) {
+      console.log(error)
       return NextResponse.redirect(new URL("/", request.nextUrl));
     }
   }
