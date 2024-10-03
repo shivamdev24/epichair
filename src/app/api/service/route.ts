@@ -15,7 +15,7 @@ const authenticateRequest = async (request: NextRequest) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY!);
     return decoded;
   } catch (error) {
-    throw new Error("Invalid token");
+    throw new Error("Invalid token", error: error.message);
   }
 };
 

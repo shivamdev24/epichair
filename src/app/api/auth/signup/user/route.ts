@@ -12,7 +12,7 @@ db();
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { email, otp } = body;
+  const { email } = body;
 
   try {
     // Check if the user already exists

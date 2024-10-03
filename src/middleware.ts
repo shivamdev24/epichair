@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET!);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userRole = (decodedToken as any).role;
 
     // Log user role for debugging
