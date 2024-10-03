@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newReminder, { status: 201 });
   } catch (error) {
     console.error("Error creating reminder:", error);
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    return NextResponse.json({ error }, { status: 401 });
   }
 }
 
@@ -82,6 +82,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: "Reminder deleted." }, { status: 200 });
   } catch (error) {
     console.error("Error deleting reminder:", error);
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    return NextResponse.json({ error }, { status: 401 });
   }
 }

@@ -15,7 +15,8 @@ const authenticateRequest = async (request: NextRequest) => {
     const decoded = jwt.verify(token, process.env.TOKEN_SECRET!);
     return decoded;
   } catch (error) {
-    throw new Error("Invalid token", error: error.message);
+    throw new Error("Invalid token", { cause: error });
+
   }
 };
 
@@ -26,7 +27,7 @@ export async function GET() {
     return NextResponse.json(services, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Error retrieving services", error: error.message },
+      { message: "Error retrieving services", error},
       { status: 500 }
     );
   }
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(newService, { status: 201 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Error creating service", error: error.message },
+      { message: "Error creating service", error },
       { status: 500 }
     );
   }
@@ -77,7 +78,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(updatedService, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "Error updating service", error: error.message },
+      { message: "Error updating service", error },
       { status: 500 }
     );
   }
@@ -97,6 +98,7 @@ export async function DELETE(request: NextRequest) {
         { message: "Service not found" },
         { status: 404 }
       );
+
     }
 
     return NextResponse.json(
@@ -105,7 +107,7 @@ export async function DELETE(request: NextRequest) {
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Error deleting service", error: error.message },
+      { message: "Error deleting service", error },
       { status: 500 }
     );
   }

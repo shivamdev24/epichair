@@ -60,8 +60,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User"; // Adjust your User model import as needed
 import db from "@/utils/db";
-// import jwt from "jsonwebtoken";
-import { getDataFromToken } from "@/utils/Token";
+import jwt from "jsonwebtoken";
 
 db(); // Ensure that your database connection is established
 
@@ -85,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // Check if the OTP is valid and not expired
     const isOtpValid = otp === user.otp; // Direct comparison of OTPs
-    const isOtpExpired = Date.now() > user.otpExpiry; // No need to call getTime() if otpExpiry is a timestamp
+    const isOtpExpired = Date.now() > user.otpExpiry.getTime(); // No need to call getTime() if otpExpiry is a timestamp
 
     if (!isOtpValid) {
       return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
@@ -99,17 +98,16 @@ export async function POST(request: NextRequest) {
     }
 
     // OTP is valid and not expired, generate JWT token
-    const token = getDataFromToken();// Token expiry time, adjust as needed
     
-    // const token = jwt.sign(
-    //   {
-    //     id: user._id,
-    //     email: user.email,
-    //     role: user.role,
-    //   },
-    //   process.env.JWT_SECRET_KEY!, // Ensure this is set in your environment
-    //   { expiresIn: "90d" } // Token expiry time, adjust as needed
-    // );
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.TOKEN_SECRET!, // Ensure this is set in your environment
+      { expiresIn: "90d" } // Token expiry time, adjust as needed
+    );
 
     // Log the token after it is generated
     console.log("Generated Token:", token); // Updated log statement

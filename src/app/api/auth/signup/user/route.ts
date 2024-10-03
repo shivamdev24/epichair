@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error signing up user:", error);
     return NextResponse.json(
-      { message: "Error signing up user", error: error.message },
+      { message: "Error signing up user", error },
       { status: 500 }
     );
   }

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Check if the OTP is valid and not expired
     const isOtpValid = otp === user.otp; // Direct comparison of OTPs
-    const isOtpExpired = Date.now() > user.otpExpiry; // No need to call getTime() if otpExpiry is a timestamp
+    const isOtpExpired = Date.now() > user.otpExpiry.getTime(); // No need to call getTime() if otpExpiry is a timestamp
 
     if (!isOtpValid) {
       return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error verifying OTP:", error);
     return NextResponse.json(
-      { message: "Error verifying OTP", error: error.message },
+      { message: "Error verifying OTP", error},
       { status: 500 }
     );
   }

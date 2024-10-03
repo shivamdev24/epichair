@@ -56,6 +56,9 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+    // Generate OTP for the new user
+    const otp = generateOtp(); // Generate an OTP
+    const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
 
     // Create a new user with the specified role or default to "staff"
     const newUser = new User({
@@ -67,9 +70,6 @@ export async function POST(request: NextRequest) {
 
     await newUser.save();
 
-    // Generate OTP for the new user
-    const otp = generateOtp(); // Generate an OTP
-    const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
 
     // Update user with OTP and expiry
     await User.findByIdAndUpdate(newUser._id, {
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error signing up user:", error);
     return NextResponse.json(
-      { message: "Error signing up user", error: error.message },
+      { message: "Error signing up user", error },
       { status: 500 }
     );
   }

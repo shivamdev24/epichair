@@ -1,18 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User"; 
-import db from "@/utils/db"; 
-import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate"; 
-import { sendEmail } from "@/utils/SendEmail"; 
-import jwt from "jsonwebtoken"
-
-
+import User from "@/models/User"; // Assuming IUser is the user interface
+import db from "@/utils/db";
+import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
+import { sendEmail } from "@/utils/SendEmail";
+import jwt from "jsonwebtoken";
 
 db();
+
+export interface IUser {
+  _id: string; 
+  email: string;
+  isVerified: boolean;
+  otp?: string;
+  otpExpiry?: Date;
+  // Other fields as needed
+}
+
 
 // Step 1: Request OTP
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { email } = body; // Include OTP in the request body
+  const { email } = body;
 
   // Check if all required fields are provided
   if (!email) {
@@ -24,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // Find the user by email
-    const user = await User.findOne({ email });
+    const user = (await User.findOne({ email })) as IUser | null; // Explicitly type the user
 
     // Check if user exists
     if (!user) {
@@ -54,10 +62,10 @@ export async function POST(request: NextRequest) {
       email,
       emailType: "LOGIN OTP",
       userId: user._id.toString(),
-      otp: generatedOtp, // Pass the generated OTP
+      otp: generatedOtp,
     });
 
-    // Generate and set a token (optional, based on your flow)
+    // Generate and set a token
     const tokenData = { id: user._id, email: user.email };
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
       expiresIn: "1d",
@@ -70,15 +78,14 @@ export async function POST(request: NextRequest) {
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 2592000, // 30d 
+      maxAge: 2592000, // 30d
     });
 
     return response;
-  }
- catch (error) {
+  } catch (error) {
     console.error("Error logging in user:", error);
     return NextResponse.json(
-      { message: "Error logging in user", error: error.message },
+      { message: "Error logging in user",  error },
       { status: 500 }
     );
   }

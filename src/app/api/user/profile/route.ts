@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error retrieving user:", error);
     return NextResponse.json(
-      { message: "Error retrieving user", error: error.message },
+      { message: "Error retrieving user", error },
       { status: 500 }
     );
   }
