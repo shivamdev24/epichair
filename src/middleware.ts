@@ -11,11 +11,11 @@ export async function middleware(request: NextRequest) {
   console.log("Token:", token);
 
   if (!token) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+    return NextResponse.redirect(new URL("/", request.nextUrl));
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY!);
+    const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET!);
     const userRole = (decodedToken as any).role;
 
     // Log user role for debugging
@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
     }
   } catch (error) {
     console.error("JWT verification error:", error);
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+    return 
   }
 
   return NextResponse.next();
@@ -46,5 +46,6 @@ export const config = {
     "/admin/:path*",
     "/user/:path*",
     "/staff/:path*",
+    "/service",
   ],
 };
