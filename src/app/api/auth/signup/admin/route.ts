@@ -8,9 +8,8 @@ db();
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { email, role } = body; // Include role in the request body
+  const { email, role } = body;
 
-  // Check if all required fields are provided
   if (!email) {
     return NextResponse.json(
       { message: "Email is required." },
@@ -19,7 +18,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -29,22 +27,19 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       } else {
-        // Resend OTP logic for unverified user
-        const otp = generateOtp(); // Generate a new OTP
-        const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
+        const otp = generateOtp();
+        const otpExpiry = getOtpExpiry(10);
 
-        // Update user with new OTP and expiry
         await User.findByIdAndUpdate(existingUser._id, {
           otp,
           otpExpiry,
         });
 
-        // Send the OTP to the user via email
         await sendEmail({
           email,
           emailType: "SIGNUP OTP",
           userId: existingUser._id.toString(),
-          otp, // Pass the generated OTP
+          otp,
         });
 
         return NextResponse.json(
@@ -56,33 +51,29 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-    
-        // Generate OTP for the new user
-        const otp = generateOtp(); // Generate an OTP
-        const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
 
-    // Create a new user with the specified role or default to "staff"
+    const otp = generateOtp();
+    const otpExpiry = getOtpExpiry(10);
+
     const newUser = new User({
       email,
-      role: role || "admin", // Allow role to be specified, default to "admin"
-      otp: otp, // Initially, set OTP to null
-      otpExpiry: otpExpiry, // Initially, set OTP expiry to null
+      role: role || "admin",
+      otp: otp,
+      otpExpiry: otpExpiry,
     });
 
     await newUser.save();
 
-    // Update user with OTP and expiry
     await User.findByIdAndUpdate(newUser._id, {
       otp,
       otpExpiry,
     });
 
-    // Send confirmation email
     await sendEmail({
       email,
       emailType: "SIGNUP OTP",
       userId: newUser._id.toString(),
-      otp, // Pass the generated OTP
+      otp,
     });
 
     return NextResponse.json(

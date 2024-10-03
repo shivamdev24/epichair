@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAppointment extends Document {
-  barber: mongoose.Types.ObjectId; // Reference to the barber/staff
-  user: mongoose.Types.ObjectId; // Reference to the user who booked the appointment
-  service: string; // Type of service for the appointment
-  appointmentDate: Date; // Appointment date
-  appointmentTime: string; // Appointment time (could use a more granular type if needed)
-  status: "pending" | "confirmed" | "completed" | "cancelled"; // Appointment status
-  feedback?: string; // Optional feedback provided by the user
+  barber: mongoose.Types.ObjectId; 
+  user: mongoose.Types.ObjectId; 
+  service: string; 
+  appointmentDate: Date; 
+  appointmentTime: string; 
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  feedback?: string;
   rating?: number; // Optional rating (1-5)
 }
 
@@ -22,8 +22,8 @@ const AppointmentSchema: Schema = new Schema({
     enum: ["pending", "confirmed", "completed", "cancelled"],
     default: "pending",
   },
-  feedback: { type: String }, // Optional feedback field
-  rating: { type: Number, min: 1, max: 5 }, // Optional rating field (1-5)
+  feedback: { type: String }, 
+  rating: { type: Number, min: 1, max: 5 }, 
 });
 
 const Appointment =

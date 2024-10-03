@@ -6,16 +6,7 @@ type ConnectionObject = {
 
 const connection: ConnectionObject = {};
 
-// mongoose.connection.on("connected", () => {
-//   console.log("MongoDB Connected");
-// });
 
-// mongoose.connection.on("error", (err) => {
-//   console.log(
-//     "MongoDB connection error, please make sure the server is running: " + err
-//   );
-//   process.exit(1);
-// });
 
 async function db(): Promise<void> {
   if (connection.isConnected) {

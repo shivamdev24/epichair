@@ -1,6 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-// Define the interface for the Service document
 interface IService extends Document {
   name: string;
   description: string;
@@ -10,7 +9,6 @@ interface IService extends Document {
   updatedAt: Date;
 }
 
-// Define the schema for the service
 const ServiceSchema: Schema<IService> = new Schema(
   {
     name: {
@@ -31,11 +29,10 @@ const ServiceSchema: Schema<IService> = new Schema(
     },
   },
   {
-    timestamps: true, // Automatically include `createdAt` and `updatedAt` fields
+    timestamps: true, 
   }
 );
 
-// Export the model with the IService type
 const Service: Model<IService> =
   mongoose.models.Service || mongoose.model<IService>("Service", ServiceSchema);
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User"; // Assuming IUser is the user interface
+import User from "@/models/User"; 
 import db from "@/utils/db";
 import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
 import { sendEmail } from "@/utils/SendEmail";
@@ -13,16 +13,13 @@ export interface IUser {
   isVerified: boolean;
   otp?: string;
   otpExpiry?: Date;
-  // Other fields as needed
 }
 
 
-// Step 1: Request OTP
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { email } = body;
 
-  // Check if all required fields are provided
   if (!email) {
     return NextResponse.json(
       { message: "Email is required." },
@@ -31,15 +28,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Find the user by email
-    const user = (await User.findOne({ email })) as IUser | null; // Explicitly type the user
+    const user = (await User.findOne({ email })) as IUser | null;
 
-    // Check if user exists
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
-    // Check if user is verified
     if (!user.isVerified) {
       return NextResponse.json(
         { message: "User is not verified." },
@@ -47,17 +41,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate OTP
     const generatedOtp = generateOtp();
-    const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
+    const otpExpiry = getOtpExpiry(10); 
 
-    // Update user with the OTP and expiry
     await User.findByIdAndUpdate(user._id, {
       otp: generatedOtp,
       otpExpiry,
     });
 
-    // Send the OTP to the user via email
     await sendEmail({
       email,
       emailType: "LOGIN OTP",
@@ -65,7 +56,6 @@ export async function POST(request: NextRequest) {
       otp: generatedOtp,
     });
 
-    // Generate and set a token
     const tokenData = { id: user._id, email: user.email };
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
       expiresIn: "1d",

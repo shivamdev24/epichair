@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get("token")?.value || "";
 
-  // Log the path and token for debugging
+  
   console.log("Path:", path);
   console.log("Token:", token);
 
@@ -19,10 +19,11 @@ export async function middleware(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userRole = (decodedToken as any).role;
 
-    // Log user role for debugging
+    
     console.log("User Role:", userRole);
 
-    // Role-based access checks
+   
+    
     if (path.startsWith("/admin") && userRole !== "admin") {
       return NextResponse.redirect(new URL("/login", request.nextUrl));
     }

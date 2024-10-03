@@ -1,12 +1,9 @@
-
-
-
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "@/utils/SendEmail"; // Adjust your import path
-import User from "@/models/User"; // Adjust your User model import as needed
-import bcrypt from "bcryptjs"; // Import bcrypt for password hashing
+import { sendEmail } from "@/utils/SendEmail";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
 import db from "@/utils/db";
-import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate"; // Import OTP functions
+import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
 
 db();
 
@@ -15,7 +12,6 @@ export async function POST(request: NextRequest) {
   const { email } = body;
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -25,11 +21,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       } else {
-        // Optionally: Send a verification email again if the user is not verified
-        const otp = generateOtp(); // Generate an OTP
-        const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
+        const otp = generateOtp();
+        const otpExpiry = getOtpExpiry(10);
 
-        // Update user with new OTP and expiry
         await User.findByIdAndUpdate(existingUser._id, {
           otp,
           otpExpiry,
@@ -38,8 +32,8 @@ export async function POST(request: NextRequest) {
         await sendEmail({
           email,
           emailType: "SIGNUP OTP",
-          userId: existingUser._id.toString(), // Ensure you're using the existing user's ID
-          otp, // Pass the generated OTP
+          userId: existingUser._id.toString(),
+          otp,
         });
 
         return NextResponse.json(
@@ -52,29 +46,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Generate OTP for the new user
-    const otp = generateOtp(); // Generate an OTP
-    const otpExpiry = getOtpExpiry(10); // Set expiry time for 10 minutes
+    const otp = generateOtp();
+    const otpExpiry = getOtpExpiry(10);
 
-    // Hash the password before saving
     const hashedOtp = await bcrypt.hash(otp, 10);
 
-    // Create a new user
-    const newUser = new User({ email, otp: hashedOtp }); // Add any other fields required
+    const newUser = new User({ email, otp: hashedOtp });
     await newUser.save();
 
-    // Update user with OTP and expiry
     await User.findByIdAndUpdate(newUser._id, {
       otp,
       otpExpiry,
     });
 
-    // Send confirmation email
     await sendEmail({
       email,
       emailType: "SIGNUP OTP",
       userId: newUser._id.toString(),
-      otp, // Pass the generated OTP
+      otp,
     });
 
     return NextResponse.json(
@@ -89,24 +78,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

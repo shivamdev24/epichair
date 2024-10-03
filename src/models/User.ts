@@ -1,53 +1,3 @@
-// import mongoose, { Schema, Document } from "mongoose";
-
-// export interface User extends Document {
-//   email: string;
-//   username?: string;
-//   otp: string;
-//   otpExpiry: Date;
-//   isVerified: boolean;
-//   role: "user" | "staff" | "admin";
-//   password?: string;
-// }
-
-// const userSchema: Schema<User> = new mongoose.Schema({
-//   username: {
-//     type: String,
-//   },
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//   },
-//   otp: {
-//     type: String,
-//     required: false,
-//   },
-//   otpExpiry: {
-//     type: Date,
-//     required: true,
-//   },
-//   isVerified: {
-//     type: Boolean,
-//     default: false,
-//   },
-//   role: {
-//     type: String,
-//     enum: ["user", "staff", "admin"],
-//     required: true,
-//   },
-//   password: {
-//     type: String,
-//     required: function (this: User) {
-//       return this.role === "admin";
-//     },
-//   },
-// });
-
-// const UserModel =  (mongoose.models.User as mongoose.Model<User>) || mongoose.model<User>("User", userSchema);
-
-// export default UserModel;
-
 
 
 
@@ -105,7 +55,7 @@ const userSchema: Schema<User> = new mongoose.Schema({
   rating: {
     type: Number,
     min: 1,
-    max: 5, // Assuming rating is between 1 and 5
+    max: 5, 
   },
 });
 
