@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
 // Create a new appointment
 export async function POST(request: NextRequest) {
   try {
-    const { service, appointmentDate, appointmentTime, barber, user } =
+    const { service, appointmentDate, appointmentTime, barber } =
       await request.json();
 
     const userId = verifyToken(request);
@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
     }
 
     const newAppointment = new Appointment({
-      barber, user,
+      barber,
+      user: userId,
       service,
       appointmentDate,
       appointmentTime,
@@ -146,7 +147,7 @@ export async function PUT(request: NextRequest) {
 
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       _id,
-      { status, service, appointmentDate, appointmentTime },
+      { status, service, appointmentDate ,appointmentTime},
       { new: true }
     );
     return NextResponse.json(updatedAppointment, { status: 200 });
