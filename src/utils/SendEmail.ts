@@ -11,11 +11,11 @@ interface SendEmailParams {
   otp?: string;
 }
 const transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
+  host: process.env.SMTP_HOST,
   port: 2525,
   auth: {
-    user: "daebe971fa300e",
-    pass: "c01b64cb439d37",
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
   },
 });
 

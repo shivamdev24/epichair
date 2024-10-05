@@ -2,10 +2,64 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
 
+import jwt, { JwtPayload } from "jsonwebtoken";
+
 db();
+
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    console.warn("No authorization token found.");
+    return null;
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
+      return (decoded as JwtPayload).id;
+    } else {
+      throw new Error("Invalid token payload.");
+    }
+  } catch (error) {
+    console.error("Token verification error:", { cause: error });
+    return null;
+  }
+};
+
+
 export async function PUT(request: NextRequest) {
   try {
+
+
+     const tokenId = verifyToken(request);
+     console.log(tokenId);
+
+     if (!tokenId) {
+       return NextResponse.json(
+         {
+           message: "Authorization required to Update an appointment Feedback.",
+         },
+         { status: 401 }
+       );
+     }
+
+
     const { appointmentId, userId, feedback, rating } = await request.json();
+
+
+
 
     if (!appointmentId || !userId) {
       return NextResponse.json(
@@ -41,12 +95,29 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// Retrieve full appointment details including feedback and rating
 export async function GET(request: NextRequest) {
   try {
+
+
+    const tokenId = verifyToken(request);
+    console.log(tokenId);
+
+    if (!tokenId) {
+      return NextResponse.json(
+        {
+          message: "Authorization required to Get an appointment Feedback.",
+        },
+        { status: 401 }
+      );
+    }
+
+
     const { searchParams } = new URL(request.url);
     const appointmentId = searchParams.get("appointmentId");
     const userId = searchParams.get("userId");
 
+    // Validate inputs
     if (!appointmentId || !userId) {
       return NextResponse.json(
         { error: "Appointment ID and User ID are required." },
@@ -54,11 +125,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    
+    // Find the appointment by ID and user ID
     const appointment = await Appointment.findOne({
       _id: appointmentId,
       user: userId,
-    }).select("feedback rating");
+    }).populate("barber") // Assuming you want to fetch barber details as well
+      .populate("user") // Assuming you want to fetch user details as well
+      .select("service appointmentDate appointmentTime feedback rating barber user");
 
     if (!appointment) {
       return NextResponse.json(
@@ -67,6 +140,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Return the full appointment details
     return NextResponse.json(appointment, { status: 200 });
   } catch (error) {
     console.error("Error while fetching feedback and rating:", error);
@@ -78,8 +152,22 @@ export async function GET(request: NextRequest) {
 }
 
 
+
 export async function DELETE(request: NextRequest) {
   try {
+
+    const tokenId = verifyToken(request);
+    console.log(tokenId);
+
+    if (!tokenId) {
+      return NextResponse.json(
+        {
+          message: "Authorization required to Delete an appointment Feedback.",
+        },
+        { status: 401 }
+      );
+    }
+
     const { appointmentId, userId } = await request.json();
 
     

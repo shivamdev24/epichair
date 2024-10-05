@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import db from "@/utils/db";
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 db();
 
@@ -21,10 +23,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
-    const isOtpValid = otp === user.otp;
+     const isOtpValid = await bcrypt.compare(otp, user.otp);
+     user.isVerified = true;
     const isOtpExpired = Date.now() > user.otpExpiry.getTime();
 
-    if (!isOtpValid) {
+    if (isOtpValid) {
       return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
     }
 
@@ -37,8 +40,19 @@ export async function POST(request: NextRequest) {
 
     console.log("login successfull");
 
+    const tokenSecret = process.env.TOKEN_SECRET || "default_secret_key";
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+      },
+      tokenSecret,
+      { expiresIn: "90d" }
+    );
+
     return NextResponse.json(
-      { message: "Login successfully!" },
+      { message: "Signup successful!", token },
       { status: 200 }
     );
   } catch (error) {

@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User"; 
+import jwt from "jsonwebtoken";
 
 export async function POST(request: NextRequest) {
   const { email, otp } = await request.json(); 
@@ -43,10 +44,23 @@ export async function POST(request: NextRequest) {
 
     const userRole = user.role;
 
-    return NextResponse.json(
-      { message: "Login successful.", role: userRole },
+    const tokenData = { id: user._id, email: user.email };
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
+      expiresIn: "1d",
+    });
+
+    const response = NextResponse.json(
+      { message: "Login successful.", role: userRole , token},
       { status: 200 }
     );
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 2592000, // 30d
+    });
+
+return response;
   } catch (error) {
     console.error("Error verifying OTP:", error);
     return NextResponse.json(

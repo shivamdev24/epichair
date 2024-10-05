@@ -3,7 +3,7 @@ import User from "@/models/User";
 import db from "@/utils/db";
 import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
 import { sendEmail } from "@/utils/SendEmail";
-import jwt from "jsonwebtoken";
+
 
 db();
 
@@ -34,12 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
-    if (!user.isVerified) {
-      return NextResponse.json(
-        { message: "User is not verified." },
-        { status: 403 }
-      );
-    }
+    
 
     const generatedOtp = generateOtp();
     const otpExpiry = getOtpExpiry(10); 
@@ -56,20 +51,20 @@ export async function POST(request: NextRequest) {
       otp: generatedOtp,
     });
 
-    const tokenData = { id: user._id, email: user.email };
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: "1d",
-    });
+    
+
+    if (!user.isVerified) {
+      return NextResponse.json(
+        { message: "User is not verified." },
+        { status: 403 }
+      );
+    }
 
     const response = NextResponse.json(
       { message: "OTP sent to your email." },
       { status: 200 }
     );
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 2592000, // 30d
-    });
+    
 
     return response;
   } catch (error) {

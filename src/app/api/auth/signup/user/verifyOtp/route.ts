@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import User from "@/models/User";
+import User from "@/models/User"; 
 import db from "@/utils/db";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"; 
 
-db();
+db(); 
 
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
 
-  console.log("Full URL:", request.url);
-  console.log("Email from URL:", email);
-
   const body = await request.json();
-  const { otp } = body;
+  const { otp } = body; 
 
   try {
     const user = await User.findOne({ email });
@@ -22,12 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
-    const isOtpValid = otp === user.otp;
-    const isOtpExpired = Date.now() > user.otpExpiry.getTime();
-
-    if (!isOtpValid) {
-      return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
-    }
+    const isOtpExpired = new Date() > user.otpExpiry;
 
     if (isOtpExpired) {
       return NextResponse.json(
@@ -36,20 +29,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const isOtpValid = await bcrypt.compare(otp, user.otp);
+
+    if (!isOtpValid) {
+      return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
+    }
+
+    const tokenSecret = process.env.TOKEN_SECRET || "default_secret_key";
     const token = jwt.sign(
       {
         id: user._id,
         email: user.email,
         role: user.role,
       },
-      process.env.TOKEN_SECRET!,
-      { expiresIn: "90d" }
+      tokenSecret,
+      { expiresIn: "90d" } 
     );
 
-    console.log("Generated Token:", token);
-
     return NextResponse.json(
-      { message: "Login successful!", token },
+      { message: "Signup successful!", token },
       { status: 200 }
     );
   } catch (error) {

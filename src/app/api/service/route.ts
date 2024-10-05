@@ -1,32 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
 import Service from "@/models/Service";
 import db from "@/utils/db";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
-const authenticateRequest = async (request: NextRequest) => {
-  const token = request.cookies.get("token")?.value;
-  if (!token) {
-    throw new Error("No token provided");
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
   }
+
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.TOKEN_SECRET!);
-    return decoded;
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
+      return (decoded as JwtPayload).id;
+    } else {
+      throw new Error("Invalid token payload.");
+    }
   } catch (error) {
-    console.error("Token verification failed:", error);
-    throw new Error("Invalid token");
+    throw new Error("Invalid token.", {cause: error});
   }
 };
 
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const userId = verifyToken(request);
+
+     console.log(userId);
+
     const services = await Service.find();
     return NextResponse.json(services, { status: 200 });
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.message === "Authorization token is required.") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    } else if (error.message === "Invalid token.") {
+      return NextResponse.json(
+        { message: "Forbidden: Invalid token" },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Error retrieving services", error },
+      { message: "Error retrieving services", error: error.message },
       { status: 500 }
     );
   }
@@ -34,24 +63,26 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await authenticateRequest(request);
+    const userId = verifyToken(request);
+     console.log(userId);
 
-    const { name, description, price, duration } = await request.json();
-
-    if (!name || !description || !price || !duration) {
-      return NextResponse.json(
-        { message: "All fields are required" },
-        { status: 400 }
-      );
-    }
-
-    const newService = new Service({ name, description, price, duration });
+    const { name, description } = await request.json();
+    const newService = new Service({ name, description });
     await newService.save();
 
     return NextResponse.json(newService, { status: 201 });
   } catch (error) {
+    if (error === "Authorization token is required.") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    } else if (error === "Invalid token.") {
+      return NextResponse.json(
+        { message: "Forbidden: Invalid token" },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Error creating service", error },
+      { message: "Error creating service", error},
       { status: 500 }
     );
   }
@@ -59,20 +90,13 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    await authenticateRequest(request);
+    const userId = verifyToken(request);
+    console.log(userId);
 
-    const { id, name, description, price, duration } = await request.json();
-
-    if (!id) {
-      return NextResponse.json(
-        { message: "Service ID is required" },
-        { status: 400 }
-      );
-    }
-
+    const { _id, name, description } = await request.json();
     const updatedService = await Service.findByIdAndUpdate(
-      id,
-      { name, description, price, duration },
+      _id,
+      { name, description },
       { new: true }
     );
 
@@ -85,27 +109,31 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(updatedService, { status: 200 });
   } catch (error) {
+    if (error === "Authorization token is required.") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    } else if (error === "Invalid token.") {
+      return NextResponse.json(
+        { message: "Forbidden: Invalid token" },
+        { status: 403 }
+      );
+    }
+
+    console.error("Error updating service:", error); 
     return NextResponse.json(
-      { message: "Error updating service", error },
+      { message: "Error updating service", error }, 
       { status: 500 }
     );
   }
 }
 
+
 export async function DELETE(request: NextRequest) {
   try {
-    await authenticateRequest(request);
+    const userId = verifyToken(request);
+     console.log(userId);
 
-    const { id } = await request.json();
-
-    if (!id) {
-      return NextResponse.json(
-        { message: "Service ID is required" },
-        { status: 400 }
-      );
-    }
-
-    const deletedService = await Service.findByIdAndDelete(id);
+    const { _id } = await request.json();
+    const deletedService = await Service.findByIdAndDelete(_id);
     if (!deletedService) {
       return NextResponse.json(
         { message: "Service not found" },
@@ -118,6 +146,15 @@ export async function DELETE(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    if (error === "Authorization token is required.") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    } else if (error === "Invalid token.") {
+      return NextResponse.json(
+        { message: "Forbidden: Invalid token" },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json(
       { message: "Error deleting service", error },
       { status: 500 }

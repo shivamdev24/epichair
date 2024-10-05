@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { sendEmail } from "@/utils/SendEmail";
-import User from "@/models/User";
-import bcrypt from "bcryptjs";
+import { sendEmail } from "@/utils/SendEmail"; 
+import User from "@/models/User"; 
+import bcrypt from "bcryptjs"; 
 import db from "@/utils/db";
-import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
+import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate"; 
 
 db();
 
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   const { email } = body;
 
   try {
+    
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
@@ -21,9 +22,11 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       } else {
-        const otp = generateOtp();
-        const otpExpiry = getOtpExpiry(10);
+        
+        const otp = generateOtp(); 
+        const otpExpiry = getOtpExpiry(10); 
 
+        
         await User.findByIdAndUpdate(existingUser._id, {
           otp,
           otpExpiry,
@@ -32,8 +35,8 @@ export async function POST(request: NextRequest) {
         await sendEmail({
           email,
           emailType: "SIGNUP OTP",
-          userId: existingUser._id.toString(),
-          otp,
+          userId: existingUser._id.toString(), 
+          otp, 
         });
 
         return NextResponse.json(
@@ -46,19 +49,24 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const otp = generateOtp();
-    const otpExpiry = getOtpExpiry(10);
+    
+    const otp = generateOtp(); 
+    const otpExpiry = getOtpExpiry(10); 
 
+    
     const hashedOtp = await bcrypt.hash(otp, 10);
 
-    const newUser = new User({ email, otp: hashedOtp });
+    
+    const newUser = new User({
+      email,
+      otp: hashedOtp,
+      otpExpiry,
+      role: "user", 
+      
+    });
     await newUser.save();
 
-    await User.findByIdAndUpdate(newUser._id, {
-      otp,
-      otpExpiry,
-    });
-
+    
     await sendEmail({
       email,
       emailType: "SIGNUP OTP",
@@ -67,7 +75,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "User registered successfully" },
+      { message: "OTP sent successfully on your mail" },
       { status: 201 }
     );
   } catch (error) {

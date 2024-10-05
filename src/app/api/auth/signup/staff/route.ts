@@ -3,6 +3,7 @@ import { sendEmail } from "@/utils/SendEmail";
 import User from "@/models/User";
 import db from "@/utils/db";
 import { generateOtp, getOtpExpiry } from "@/utils/OtpGenerate";
+import bcrypt from "bcryptjs"
 
 db();
 
@@ -27,11 +28,13 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       } else {
-        const otp = generateOtp();
+        
+    const otp = generateOtp();
+    const hashedOtp = await bcrypt.hash(otp, 10); 
         const otpExpiry = getOtpExpiry(10);
 
         await User.findByIdAndUpdate(existingUser._id, {
-          otp,
+          hashedOtp,
           otpExpiry,
         });
 
@@ -52,7 +55,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const otp = generateOtp();
+    const otp = generateOtp(); 
+    const hashedOtp = await bcrypt.hash(otp, 10); 
     const otpExpiry = getOtpExpiry(10);
 
     const newUser = new User({
@@ -65,7 +69,7 @@ export async function POST(request: NextRequest) {
     await newUser.save();
 
     await User.findByIdAndUpdate(newUser._id, {
-      otp,
+      hashedOtp,
       otpExpiry,
     });
 
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "User registered successfully" },
+      { message: "OTP sent successfully to your mail!" },
       { status: 201 }
     );
   } catch (error) {
