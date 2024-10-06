@@ -170,7 +170,7 @@ export async function POST(request: NextRequest) {
 
       await sendEmail({
         email,
-        emailType: "SIGNUP OTP",
+        emailType: "LOGIN OTP",
         userId: existingUser._id.toString(),
         otp,
       });

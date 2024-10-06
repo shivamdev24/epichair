@@ -1,3 +1,5 @@
+
+
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/utils/SendEmail";
 import User from "@/models/User";
@@ -23,19 +25,21 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       if (existingUser.isVerified) {
         return NextResponse.json(
-          { message: "User already exists and is verified" },
+          { message: "User already exists and is verified." },
           { status: 400 }
         );
       } else {
+        // Generate new OTP and update the user
         const otp = generateOtp();
         const hashedOtp = await bcrypt.hash(otp, 10);
         const otpExpiry = getOtpExpiry(10);
 
         await User.findByIdAndUpdate(existingUser._id, {
-          hashedOtp,
+          otp: hashedOtp,
           otpExpiry,
         });
 
+        // Send OTP email
         await sendEmail({
           email,
           emailType: "SIGNUP OTP",
@@ -77,7 +81,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "OTP sent successfully to your mail!" },
+      { message: "OTP sent successfully to your email!" },
       { status: 201 }
     );
   } catch (error) {

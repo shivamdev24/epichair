@@ -1,3 +1,7 @@
+
+
+
+
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import db from "@/utils/db";
@@ -20,23 +24,23 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email });
 
     if (!user) {
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
+    }
+
+    // Check if the OTP has expired
+    const isOtpExpired = Date.now() > user.otpExpiry.getTime();
+    if (isOtpExpired) {
       return NextResponse.json(
-        { message: "User  not found." },
-        { status: 404 }
+        { message: "OTP has expired." },
+        { status: 400 }
       );
     }
 
     // Compare the OTP with the hashed OTP stored in the database
-    const isOtpValid = await bcrypt.compare(otp, user.otp); 
-    const isOtpExpired = Date.now() > user.otpExpiry.getTime();
-
-    if (!isOtpValid) {
-      return NextResponse.json({ message: "Invalid OTP." }, { status: 400 });
-    }
-
-    if (isOtpExpired) {
+    const isOtpValid = await bcrypt.compare(otp.trim(), user.otp);
+    if (isOtpValid) {
       return NextResponse.json(
-        { message: "OTP has expired." },
+        { message: "Invalid OTP. Please try again.", isOtpValid },
         { status: 400 }
       );
     }
@@ -48,7 +52,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error("Error updating user:", error);
       return NextResponse.json(
-        { message: "Error updating user", error },
+        { message: "Error updating user." },
         { status: 500 }
       );
     }
@@ -60,7 +64,7 @@ export async function POST(request: NextRequest) {
     if (!tokenSecret) {
       console.error("TOKEN_SECRET environment variable is not set.");
       return NextResponse.json(
-        { message: "Internal Server Error" },
+        { message: "Internal Server Error." },
         { status: 500 }
       );
     }
@@ -83,14 +87,14 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       console.error("Error creating token:", error);
       return NextResponse.json(
-        { message: "Error creating token", error },
+        { message: "Error creating token." },
         { status: 500 }
       );
     }
   } catch (error) {
     console.error("Error verifying OTP:", error);
     return NextResponse.json(
-      { message: "Error verifying OTP", error },
+      { message: "Error verifying OTP." },
       { status: 500 }
     );
   }
