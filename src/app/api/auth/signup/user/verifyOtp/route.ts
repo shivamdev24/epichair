@@ -38,9 +38,10 @@ export async function POST(request: NextRequest) {
 
     // Compare the OTP with the hashed OTP stored in the database
     const isOtpValid = await bcrypt.compare(otp.trim(), user.otp);
-    if (isOtpValid) {
+    console.log(isOtpValid)
+    if (!isOtpValid) {
       return NextResponse.json(
-        { message: "Invalid OTP. Please try again.", isOtpValid },
+        { message: "OTP Invalid." },
         { status: 400 }
       );
     }

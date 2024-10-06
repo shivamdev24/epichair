@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message:
-            "User already exists and is verified. A new verification email has been sent.",
+            "User already exists and is verified. A otp email has been sent.",
         },
         { status: 200 } // Change status to 200 for successful operation
       );
