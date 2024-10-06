@@ -1,6 +1,3 @@
-
-
-
 import nodemailer from "nodemailer";
 import User from "@/models/User";
 
@@ -10,9 +7,10 @@ interface SendEmailParams {
   userId: string;
   otp?: string;
 }
+
 const transport = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
+  port: Number(process.env.SMTP_PORT), // Convert to number
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -23,14 +21,13 @@ export const sendEmail = async ({
   email,
   emailType,
   userId,
-  otp
+  otp,
 }: SendEmailParams) => {
   if (!userId) {
     throw new Error("User ID is required");
   }
 
   try {
-   
     const updatedUser = await User.findByIdAndUpdate(userId);
     if (!updatedUser) {
       throw new Error("User not found");
@@ -42,18 +39,16 @@ export const sendEmail = async ({
         : "Reset Your Password";
 
     const htmlContent = `
-      <p>your ${emailType} is ${otp} expiry time for OTP 10 minutes
-      </p>`;
+      <p>Your ${emailType} is ${otp}. The expiry time for OTP is 10 minutes.</p>`;
 
     const mailOptions = {
       from: {
-        address: "owner@gmail.com", 
-        name: "Your Name", 
+        address: "owner@gmail.com",
+        name: "Epic Hair",
       },
-      to: email, 
-      subject, 
-      
-      html: htmlContent, 
+      to: email,
+      subject,
+      html: htmlContent,
     };
 
     const mailResponse = await transport.sendMail(mailOptions);
