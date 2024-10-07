@@ -156,6 +156,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       
+      
 
       // Generate and send OTP for non-verified user
       const otp = generateOtp();

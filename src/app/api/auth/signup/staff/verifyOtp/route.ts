@@ -26,6 +26,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!user.otp) {
+      return NextResponse.json(
+        { message: "OTP is not available." },
+        { status: 400 }
+      );
+    }
+    if (!user.otpExpiry) {
+      return NextResponse.json(
+        { message: "OtpExpiry is not available." },
+        { status: 400 }
+      );
+    }
+
+
     // Compare the OTP with the hashed OTP stored in the database
     const isOtpValid = await bcrypt.compare(otp, user.otp); 
     const isOtpExpired = Date.now() > user.otpExpiry.getTime();
@@ -66,20 +80,23 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const token = jwt.sign(
-        {
-          id: user._id,
-          email: user.email,
-          role: user.role,
-        },
-        tokenSecret,
-        { expiresIn: "90d" }
-      );
+       const tokenData = { id: user._id, email: user.email, role: user.role };
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
+      expiresIn: "10d"
+    });
 
-      return NextResponse.json(
-        { message: "Signup successful!", token },
-        { status: 200 }
-      );
+    const response = NextResponse.json(
+      { message: "Signup successful.", role: user.role, token },
+      { status: 200 }
+    );
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 2592000, // 30d
+    });
+
+    return response;
     } catch (error) {
       console.error("Error creating token:", error);
       return NextResponse.json(

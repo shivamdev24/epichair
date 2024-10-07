@@ -102,15 +102,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
-    // Check OTP expiry before comparing
-    if (new Date() > new Date(user.otpExpiry)) {
+    if (user.otpExpiry && new Date() > new Date(user.otpExpiry)) {
       return NextResponse.json(
         { message: "OTP has expired." },
         { status: 401 }
       );
     }
 
-    const isOtpValid = await bcrypt.compare(otp, user.otp);
+if (!user.otp) {
+  return NextResponse.json(
+    { message: "OTP is not available." },
+    { status: 400 }
+  );
+}
+
+const isOtpValid = await bcrypt.compare(otp, user.otp);
+
 
     if (!isOtpValid) {
       return NextResponse.json({ message: "Invalid OTP." }, { status: 401 });
@@ -128,9 +135,9 @@ export async function POST(request: NextRequest) {
     user.isVerified = true; // Update the isVerified field
     await user.save(); // Save the updated user
 
-    const tokenData = { id: user._id, email: user.email };
+    const tokenData = { id: user._id, email: user.email, role: user.role };
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: "1d",
+      expiresIn: "10d"
     });
 
     const response = NextResponse.json(

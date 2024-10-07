@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import Service from "@/models/Service";
 import db from "@/utils/db";
+import Service from "@/models/Service";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
+// Connect to the database
 db();
 
 const verifyToken = (request: NextRequest) => {
-  const authHeader = request.headers.get("Authorization");
+  
   let token: string | null = null;
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
-  } else {
-    token = request.cookies.get("token")?.value || null;
-  }
+  
+  token = request.cookies.get("token")?.value || null;
 
   if (!token) {
     throw new Error("Authorization token is required.");
@@ -31,132 +29,27 @@ const verifyToken = (request: NextRequest) => {
       throw new Error("Invalid token payload.");
     }
   } catch (error) {
-    throw new Error("Invalid token.", {cause: error});
+    throw new Error("Invalid token.", { cause: error });
   }
 };
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
+    const user = verifyToken(request);
 
-     console.log(userId);
-
-    const services = await Service.find();
+    // Check if user is authenticated and is an admin
+    if (!user) {
+      return NextResponse.json(
+        { message: "Authorization required to create a service." },
+        { status: 401 }
+      );
+    }
+    const services = await Service.find(); // Fetch all services
     return NextResponse.json(services, { status: 200 });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    if (error.message === "Authorization token is required.") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    } else if (error.message === "Invalid token.") {
-      return NextResponse.json(
-        { message: "Forbidden: Invalid token" },
-        { status: 403 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Error retrieving services", error: error.message },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const userId = verifyToken(request);
-     console.log(userId);
-
-    const { name, description } = await request.json();
-    const newService = new Service({ name, description });
-    await newService.save();
-
-    return NextResponse.json(newService, { status: 201 });
   } catch (error) {
-    if (error === "Authorization token is required.") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    } else if (error === "Invalid token.") {
-      return NextResponse.json(
-        { message: "Forbidden: Invalid token" },
-        { status: 403 }
-      );
-    }
-
+    console.error("Error fetching services:", error);
     return NextResponse.json(
-      { message: "Error creating service", error},
-      { status: 500 }
-    );
-  }
-}
-
-export async function PUT(request: NextRequest) {
-  try {
-    const userId = verifyToken(request);
-    console.log(userId);
-
-    const { _id, name, description } = await request.json();
-    const updatedService = await Service.findByIdAndUpdate(
-      _id,
-      { name, description },
-      { new: true }
-    );
-
-    if (!updatedService) {
-      return NextResponse.json(
-        { message: "Service not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(updatedService, { status: 200 });
-  } catch (error) {
-    if (error === "Authorization token is required.") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    } else if (error === "Invalid token.") {
-      return NextResponse.json(
-        { message: "Forbidden: Invalid token" },
-        { status: 403 }
-      );
-    }
-
-    console.error("Error updating service:", error); 
-    return NextResponse.json(
-      { message: "Error updating service", error }, 
-      { status: 500 }
-    );
-  }
-}
-
-
-export async function DELETE(request: NextRequest) {
-  try {
-    const userId = verifyToken(request);
-     console.log(userId);
-
-    const { _id } = await request.json();
-    const deletedService = await Service.findByIdAndDelete(_id);
-    if (!deletedService) {
-      return NextResponse.json(
-        { message: "Service not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Service deleted successfully" },
-      { status: 200 }
-    );
-  } catch (error) {
-    if (error === "Authorization token is required.") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    } else if (error === "Invalid token.") {
-      return NextResponse.json(
-        { message: "Forbidden: Invalid token" },
-        { status: 403 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Error deleting service", error },
+      { message: "Failed to fetch services." },
       { status: 500 }
     );
   }

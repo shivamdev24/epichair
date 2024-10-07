@@ -1,117 +1,136 @@
-// "use client";
+"use client";
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 
-// import React, { useState } from 'react';
-// import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Axios from "axios";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import HashLoader from "react-spinners/HashLoader";
 
-// function OtpForm() {
-//   const [email, setEmail] = useState('');
-//   const [otp, setOtp] = useState('');
-//   const router = useRouter();
+export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-//   const handleSendOtp = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const response = await fetch('/api/auth/login', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ email }),
-//       });
+  const [buttonDisabled, setButtonDisabled] = useState({
+    login: true,
+    otp: true,
+  });
+  const [loading, setLoading] = useState(false);
+  // const [errorMessage, setErrorMessage] = useState("");
 
-//       if (!response.ok) {
-//         throw new Error('Failed to send OTP');
-//       }
+  const router = useRouter();
 
-//       const data = await response.json();
-//       console.log('OTP sent to:', email);
-//       console.log(data);
-//     } catch (error) {
-//       console.error('Error sending OTP:', error);
-//     }
-//   };
+  useEffect(() => {
+    if (email.length > 0 && password.length > 0) {
+      setButtonDisabled({ login: false, otp: false }); // Enable both buttons
+    } else if (email.length > 0 && password.length === 0) {
+      setButtonDisabled({ login: true, otp: false }); // Enable only OTP button
+    } else {
+      setButtonDisabled({ login: true, otp: true }); // Disable both buttons
+    }
+  }, [email, password]);
 
-  
+  const onSignIn = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent the default form submission
 
+    setLoading(true);
+    // setErrorMessage(""); // Clear any previous error messages
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     try {
-//       console.log('Submitting OTP verification:', { email, otp }); // Log request data for debugging
+    try {
+      const response = await Axios.post("/api/admin/auth/loginwithPassword", { email, password });
+      console.log("Sent verification Otp Successfully.", response.data);
+      router.push(`/dashboard`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Login failed:", error); // Log the error for debugging
+      // setErrorMessage(
+      //   error.response?.data?.message || "An error occurred during login." // Display error message
+      // );
+    } finally {
+      setLoading(false); // Ensure loading state is reset
+    }
+  };
 
-//       const response = await fetch('/api/auth/login/verifyOtp', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ email, otp }), // Send email and OTP in the body
-//       });
+  const onOtpLogin = async () => {
+    // Redirect to the OTP verification route
+    const response = await Axios.post("/api/auth/login", { email });
+    console.log("Sent verification Otp Successfully.", response.data);
+    router.push(`/auth/login/verifyotp?email=${encodeURIComponent(email)}`);
+  };
 
-//       // Log the response to understand any errors
-//       console.log('Response:', response);
-
-//       if (!response.ok) {
-//         const errorData = await response.json();
-//         throw new Error(`OTP verification failed: ${errorData.message || 'Unknown error'}`);
-//       }
-
-//       const data = await response.json();
-//       console.log('Verify OTP:', otp);
-//       console.log(data);
-
-//       // Check if the role is 'user'
-//       if (data.role === 'user') {
-//         router.push('/user'); // Redirect to user page
-//       } if (data.role === 'staff') {
-//         router.push('/staff'); // Redirect to user page
-//       }      
-//       else {
-//         console.log('User role is not user:', data.role);
-//       }
-//     } catch (error) {
-//       console.error('Error verifying OTP:', error);
-//     }
-//   };
-
-
-
-
-
-
-
-//   return (
-//     <div>
-//       <form onSubmit={handleSubmit}>
-//         <input
-//           type="email"
-//           name="email"
-//           placeholder="Email"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//           required
-//         />
-//         <button type="button" onClick={handleSendOtp}>Send OTP</button>
-//         <input
-//           type="text"
-//           placeholder="OTP verification"
-//           value={otp}
-//           onChange={(e) => setOtp(e.target.value)}
-//           required
-//         />
-//         <button type="submit">Submit</button>
-//       </form>
-//     </div>
-//   );
-// }
-
-// export default OtpForm;
-
-import React from 'react'
-
-function page() {
   return (
-    <div>page</div>
-  )
-}
+    <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
+      <div>
+        {loading ? (
+          <p className="flex mx-auto h-screen justify-center items-center text-6xl">
+            <HashLoader
+              color="#000"
+              loading={loading}
+              size={80}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </p>
+        ) : ""}
+        {/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
+        <Card className="w-full p-8 flex mx-auto flex-col justify-center items-center ">
+          <CardHeader>
+            <CardTitle>Login Into Account</CardTitle>
+          </CardHeader>
+          <form onSubmit={onSignIn}>
+            <CardContent>
+              <Input
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </CardContent>
+            <CardContent>
+              <Input
+                placeholder="Password"
+                autoComplete="current-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </CardContent>
+            <CardContent>
+              <Button
+                className="w-full"
+                type="submit"
+                disabled={buttonDisabled.login}
+              >
+                {buttonDisabled.login ? "Required Field" : "Login"}
+              </Button>
+            </CardContent>
+          </form>
+            <CardContent>
+              <Button
+                disabled={buttonDisabled.otp}
+                className="w-full"
+                onClick={onOtpLogin}
+              >
+                {buttonDisabled.otp ? "Required Field" : "Login With OTP"}
+              </Button>
+            </CardContent>
+          <Separator />
+          <CardFooter className="mt-4 flex gap-3">
 
-export default page
+            <p>Don&apos;t have an account? </p>
+            <Link
+              className="text-blue-500 hover:text-gray-900 duration-500"
+              href="/auth/signup"
+            >
+              Signup here.
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
+}
