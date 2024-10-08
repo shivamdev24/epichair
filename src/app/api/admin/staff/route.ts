@@ -170,7 +170,6 @@ export async function PUT(request: NextRequest) {
 
     // Update the user's details
     existingUser.username = name;
-    existingUser.skills = skills;
     existingUser.services = services;
 
     await existingUser.save();

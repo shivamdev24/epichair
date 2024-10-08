@@ -32,7 +32,7 @@ const AppointmentSchema: Schema = new Schema({
   },
   feedback: { type: String },
   rating: { type: Number, min: 1, max: 5 },
-});
+},{timestamps: true});
 
 // Create the Appointment model
 const Appointment =
