@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         role: existingUser.role,
       },
       process.env.TOKEN_SECRET!,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
     const response = NextResponse.json(
@@ -75,7 +75,8 @@ export async function POST(request: NextRequest) {
     response.cookies.set("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: 2592000, // 30d
+      sameSite: "strict",
+      maxAge: 86400, // 30d
     });
 
     

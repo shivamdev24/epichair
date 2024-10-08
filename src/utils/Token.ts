@@ -1,38 +1,53 @@
-import { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextRequest, NextResponse } from "next/server";
 
-type DecodedToken = {
-  id: string; 
-  iat?: number; 
-  exp?: number; 
-};
+export const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
 
-export const getDataFromToken = (
-  request: NextRequest
-): string | { error: string } => {
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    console.warn("No authorization token found.");
+    return null;
+  }
+
   try {
-   
-    const token = request.cookies.get("token")?.value || "";
+    // Verify the token and decode it
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    ) as JwtPayload;
 
-    if (!token) {
-      return { error: "Authentication token is required." };
+    // Check if the decoded token contains an ID
+    if (decoded && decoded.id) {
+      return decoded.id;
+    } else {
+      throw new Error("Invalid token payload.");
+    }
+  } catch (error) {
+    console.error("Token verification error:", { cause: error });
+
+    // If the token is expired or invalid, clear the cookie
+    if ((error as Error).name === "TokenExpiredError") {
+      // Set the token cookie to empty to clear it
+      return NextResponse.json(
+        {
+          message: "token error",
+        },
+        {
+          status: 401,
+          headers: {
+            "Set-Cookie": "token=; Max-Age=0; HttpOnly; Secure; SameSite=Lax",
+          },
+        }
+      );
     }
 
-    
-    const decodedToken = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET!
-    ) as DecodedToken;
-console.log(token);
-    
-    return decodedToken.id; 
-  } catch (error) {
-    console.error("Error getting data from token:", error);
-    return { error: "Invalid token" };
+    return null;
   }
 };
-
-
-
-
-

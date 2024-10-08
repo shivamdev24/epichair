@@ -16,7 +16,7 @@ interface Appointment {
   status: string;
   appointmentType: ReactNode;
   _id: string;
-  service: string;
+  service: {name: string};
   appointmentDate: string | number | Date;
   barber: {
     username: string;
@@ -42,7 +42,11 @@ const Dashboard = () => {
         const response = await fetch('/api/admin/appointment');
         const data = await response.json();
 
-        setAppointments(data);
+        if (Array.isArray(data)) {
+          setAppointments(data);
+        } else {
+          console.error("Unexpected response format");
+        }
 
         // Get today's date
         const today = new Date();
@@ -114,9 +118,11 @@ const Dashboard = () => {
   // Calculate the start and end index for slicing the appointments array
   const startIndex = (currentPage - 1) * appointmentsPerPage;
   const endIndex = startIndex + appointmentsPerPage;
+  const currentAppointments = Array.isArray(appointments)
+    ? appointments.slice(startIndex, endIndex)
+    : [];
 
   // Get the appointments for the current page
-  const currentAppointments = appointments.slice(startIndex, endIndex);
 
   return (
     <div className='px-5'>
@@ -196,7 +202,7 @@ const Dashboard = () => {
               <tr key={appointment._id}>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.username || 'Unknown Barber'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.username || 'Unknown User'}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "Unknown"}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
@@ -234,7 +240,7 @@ const Dashboard = () => {
               <tr key={appointment._id}>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.username || 'Unknown Barber'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.username || 'Unknown User'}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
@@ -280,3 +286,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+

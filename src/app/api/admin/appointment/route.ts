@@ -1,41 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { verifyToken } from "@/utils/Token";
+
 
 db();
 
-const verifyToken = (request: NextRequest) => {
-  const authHeader = request.headers.get("Authorization");
-  let token: string | null = null;
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
-  } else {
-    token = request.cookies.get("token")?.value || null;
-  }
 
-  if (!token) {
-    console.warn("No authorization token found.");
-    return null;
-  }
 
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET || "default_secret_key"
-    );
 
-    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-      return (decoded as JwtPayload).id;
-    } else {
-      throw new Error("Invalid token payload.");
-    }
-  } catch (error) {
-    console.error("Token verification error:", { cause: error });
-    return null;
-  }
-};
+
+// export async function GET(request: NextRequest) {
+
+//   try {
+//     // Verify user token
+//     const userId = verifyToken(request);
+//     console.log(userId);
+
+//     // Check if user is authenticated
+//     if (!userId) {
+//       return NextResponse.json(
+//         { message: "Authorization required to GET appointments." },
+//         { status: 401 }
+//       );
+//     }
+
+//     // Fetch all appointments from the database
+//     const appointments = await Appointment.find()
+//       .populate("barber")
+//       .populate("user")
+//       .exec();
+//       .populate("service")
+//       .catch((error) => {
+//         console.error("Error fetching appointments:", error);
+//         throw error; // This will allow the error to be caught in the catch block above
+//       });
+//     // Return the list of appointments
+
+
+
+    
+//     return NextResponse.json(appointments, { status: 200 });
+//   } catch (error) {
+//     console.error("Error while fetching appointments:", error);
+//     return NextResponse.json(
+//       { message: "Failed to fetch appointments." },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
+
 
 
 
@@ -56,11 +74,12 @@ export async function GET(request: NextRequest) {
 
     // Fetch all appointments from the database
     const appointments = await Appointment.find()
-      .populate("barber") // Populate barber details
-      .populate("user"); // Populate user details
+      .populate("barber")
+      .populate("user")
+      .populate("service");
 
-    // Return the list of appointments
-    return NextResponse.json(appointments, { status: 200 });
+    // Return the list of appointments, or an empty array if none found
+    return NextResponse.json(appointments || [], { status: 200 });
   } catch (error) {
     console.error("Error while fetching appointments:", error);
     return NextResponse.json(
@@ -69,6 +88,10 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+
+
+
 
 
 

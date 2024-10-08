@@ -1,37 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Service from "@/models/Service";
-import jwt, { JwtPayload } from "jsonwebtoken";
+
+import { verifyToken } from "@/utils/Token";
 
 // Connect to the database
 db();
 
-const verifyToken = (request: NextRequest) => {
-  
-  let token: string | null = null;
 
-  
-  token = request.cookies.get("token")?.value || null;
-
-  if (!token) {
-    throw new Error("Authorization token is required.");
-  }
-
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET || "default_secret_key"
-    );
-
-    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-      return (decoded as JwtPayload).id;
-    } else {
-      throw new Error("Invalid token payload.");
-    }
-  } catch (error) {
-    throw new Error("Invalid token.", { cause: error });
-  }
-};
 
 export async function GET(request: NextRequest) {
   try {
