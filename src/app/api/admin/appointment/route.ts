@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
@@ -77,6 +78,11 @@ export async function GET(request: NextRequest) {
       .populate("barber")
       .populate("user")
       .populate("service");
+
+
+      if(!appointments){
+console.error("fetch error", appointments);
+      }
 
     // Return the list of appointments, or an empty array if none found
     return NextResponse.json(appointments || [], { status: 200 });

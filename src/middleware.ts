@@ -4,7 +4,15 @@ import { jwtVerify } from "jose";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const token = request.cookies.get("token")?.value || "";
+let token: string | null = null;
+  const authHeader = request.headers.get("Authorization");
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+     token = request.cookies.get("token")?.value || "";
+  }
+
 
   console.log("Path:", path);
   console.log("Token:", token);
@@ -24,7 +32,7 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(token, secret);
     const userRole = payload.role;
 
-    console.log("User Role:", userRole,payload);
+    console.log("User Role:", userRole, payload);
 
     // Check user role and restrict access to specific paths
     if (path.startsWith("/dashboard") && userRole !== "admin") {
