@@ -13,7 +13,7 @@ export interface User extends Document {
   feedback?: string; // Optional feedback field
   rating?: number; // Optional rating field
   services?: string[]; // Optional services field
-  skills?: string[]; // Optional skills field
+  // skills?: string[]; // Optional skills field
 }
 
 // Define the user schema
@@ -61,10 +61,10 @@ const userSchema: Schema<User> = new mongoose.Schema({
     type: [String], // Array of strings for services
     required: false, // Not required
   },
-  skills: {
-    type: [String], // Array of strings for skills
-    required: false, // Not required
-  },
+  // skills: {
+  //   type: [String], // Array of strings for skills
+  //   required: false, // Not required
+  // },
 });
 
 // Create the User model

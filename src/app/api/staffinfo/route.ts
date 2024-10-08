@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
             email: user.email,
             name: user.username,
             role: user.role,
-            Skills: user.skills,
             Service: user.services,
         })),
       },

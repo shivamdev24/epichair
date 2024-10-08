@@ -32,6 +32,7 @@ const Sidebar = () => {
     { name: "Dashboard", href: "/dashboard" },
     { name: "Appointments", href: "/dashboard/appointments" },
     { name: "Profile", href: "/dashboard/profile" },
+    { name: "User", href: "/dashboard/user" },
   ];
 
   return (

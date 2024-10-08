@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         id: existingUser._id,
         email: existingUser.email,
         role: existingUser.role,
+        name: existingUser.username,
       },
       process.env.TOKEN_SECRET!,
       { expiresIn: "24h" }
