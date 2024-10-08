@@ -163,8 +163,14 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { status, service, appointmentDate, appointmentTime } =
-      await request.json();
+    const {
+      status,
+      service,
+      appointmentDate,
+      appointmentTime,
+      feedback,
+      rating,
+    } = await request.json();
 
     const userId = verifyToken(request);
     console.log(userId);
@@ -189,7 +195,7 @@ export async function PUT(request: NextRequest) {
     // Update the appointment with the provided data
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       _id,
-      { status, service, appointmentDate, appointmentTime },
+      { status, service, appointmentDate, appointmentTime, feedback, rating },
       { new: true }
     );
 

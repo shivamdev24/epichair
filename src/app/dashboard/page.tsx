@@ -104,11 +104,20 @@ const Dashboard = () => {
         console.error('Error fetching staff:', error);
       }
     };
+    const callservice = async () => {
+      const response = await fetch('/api/admin/service');
+      const data = await response.json();
+
+      // Log the entire data object
+      console.log('Fetched Staff Data:', data);
+      
+    };
 
 
     fetchAppointments();
     fetchUser();
     fetchStaff();
+    callservice();
   }, []);
   
 

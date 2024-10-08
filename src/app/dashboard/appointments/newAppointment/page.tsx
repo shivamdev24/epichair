@@ -81,7 +81,7 @@ const NewAppointment = () => {
         try {
             const response = await axios.post(`/api/admin/appointment`, {
                 barber: selectedBarber,
-                services: selectedService,
+                service: selectedService,
                 appointmentDate,
                 appointmentTime,
                 status,
