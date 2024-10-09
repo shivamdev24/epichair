@@ -14,6 +14,8 @@ export interface User extends Document {
   rating?: number; // Optional rating field
   services?: string[]; // Optional services field
   // skills?: string[]; // Optional skills field
+  image_url?: string;
+  public_id?: string;
 }
 
 // Define the user schema
@@ -62,6 +64,8 @@ const userSchema: Schema<User> = new mongoose.Schema(
       type: [String], // Array of strings for services
       required: false, // Not required
     },
+    image_url: { type: String, required: false }, // Define imageUrl field
+    public_id: { type: String, required: false }, // Define imageUrl field
     // skills: {
     //   type: [String], // Array of strings for skills
     //   required: false, // Not required

@@ -1,0 +1,46 @@
+Admin
+ - login/Signup
+ - Staff
+    - Create, Read, Update, Delete [ Staff with login credentials, services ]
+ - Services
+    - CRUD 
+ - Appointment
+    - CRUD [ select staff member for appointment, time, date, service ]
+ - Feedback + Rating ( from user ) 
+    - CRUD [ by user ]
+    - RD [ by Admin ]
+    - R [ by Staff ]
+ - User
+    - RD [ by Admin ]
+
+Staff
+ -Appointment
+ -Feedback + Rating
+ - Reminder
+ - login/Signup
+
+User
+ - Account
+    - CRUD [ before ]
+    - RUD [ after signup ]
+ - Appointment
+    - CRUD [ date, time, service, staff, duration ]
+ - Reminder
+    - CRUD [ date, time ]
+ - login/Signup 
+ - Feedback + Rating
+    - CRUD [ message, rating if any complete appointment ]
+
+
+login/signup
+    - otp
+    - password + otp
+
+
+
+jwt
+mongoose
+bcrypt
+nodemailer
+shadcn 
+

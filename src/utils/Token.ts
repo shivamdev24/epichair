@@ -2,14 +2,9 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
 export const verifyToken = (request: NextRequest) => {
-  let token: string | null = null;
-  // const authHeader = request.headers.get("Authorization");
-
-  // if (authHeader && authHeader.startsWith("Bearer ")) {
-  //   token = authHeader.split(" ")[1];
-  // } else {
-  // }
-  token = request.cookies.get("token")?.value || null;
+  
+ 
+  const token = request.cookies.get("token")?.value || "";
 
   if (!token) {
     console.warn("No authorization token found.");
