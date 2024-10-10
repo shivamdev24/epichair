@@ -9,8 +9,8 @@ import Link from "next/link";
 
 interface Appointment {
   _id: string;
-  barber: { username: string } | null;
-  user: { email: string } | null;
+  barber: { username: string, email: string } | null;
+  user: { email: string, username: string } ;
   service: {name: string} | null;
   appointmentDate: string;
   appointmentTime?: string;
@@ -37,6 +37,7 @@ const Appointment = () => {
         }
 
         const data = await response.json();
+        console.log(data)
         
         if (Array.isArray(data)) {
           setAppointments(data);
@@ -136,43 +137,58 @@ const Appointment = () => {
             <table className="min-w-full">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">User</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Barber</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Service</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Appointment Date</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Appointment Time</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Status</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Type</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Feedback</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Rating</th>
-                  <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
+                  <th className="px-6 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">User</th>
+                  <th className="px-6 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">User Email</th>
+                  <th className="px-6 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Barber</th>
+                  <th className="px-6 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Barber Email</th>
+                  <th className="px-6 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Service</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Appointment Date</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Appointment Time</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Status</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Type</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Feedback</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Rating</th>
+                  <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {currentAppointments.map((appointment) => (
                   <tr key={appointment._id}>
-                    <td className="px-6 text-center  py-4 whitespace-no-wrap border-b border-gray-500">
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                      { appointment.user?.username || "No User"}
+                    </td>
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
                       { appointment.user?.email || "No User"}
                     </td>
-                    <td className="px-6 text-center  py-4 whitespace-no-wrap border-b border-gray-500">
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
                       { appointment.barber?.username || "Unknown Barber"}
                     </td>
-                    <td className="px-6 text-center  py-4 whitespace-no-wrap border-b border-gray-500">{ appointment.service?.name || "error"}</td>
-                    <td className="px-6 text-center  py-4 whitespace-no-wrap border-b border-gray-500">
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                      { appointment.barber?.email || "Unknown Barber"}
+                    </td>
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">{ appointment.service?.name || "No Services"}</td>
+                    <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
                       {new Date(appointment.appointmentDate).toLocaleDateString("en-IN", {
                         year: "numeric",
                         month: "2-digit",
                         day: "2-digit",
                       })}
                     </td>
-                    <td className="px-6 text-center py-4 whitespace-no-wrap border-b border-gray-500">{appointment.appointmentTime || "Not Set"}</td>
-                    <td className="px-6 text-center py-4 whitespace-no-wrap border-b border-gray-500">{appointment.status}</td>
-                    <td className="px-6 text-center py-4 whitespace-no-wrap border-b border-gray-500">{appointment.appointmentType}</td>
-                    <td className="px-6 text-center py-4 whitespace-no-wrap border-b border-gray-500">{appointment.feedback || "No Feedback"}</td>
-                    <td className="px-6 text-center py-4 whitespace-no-wrap border-b border-gray-500">
+                    <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.appointmentTime || "Not Set"}</td>
+                    <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
+                      appointment.status === "confirmed" ? "bg-green-500" :
+                        appointment.status === "completed" ? "bg-blue-500" :
+                          appointment.status === "cancelled" ? "bg-red-500" :
+                            "text-gray-500" // Fallback color for undefined status
+                      }`}>
+                      {appointment.status}
+                    </td>
+                    <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.appointmentType}</td>
+                    <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.feedback || "No Feedback"}</td>
+                    <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">
                       {appointment.rating !== undefined ? appointment.rating : "Not Rated"}
                     </td>
-                    <td className="px-6 py-3 border-b border-gray-500 text-left text-sm leading-4 text-gray-600 tracking-wider space-x-2">
+                    <td className="px-6 py-3 border border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider space-x-2">
                       <Link
                         href={`/dashboard/appointments/${appointment._id}`}
                         className="px-2 py-1 bg-yellow-500 text-white rounded"

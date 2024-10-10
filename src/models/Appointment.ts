@@ -4,7 +4,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IAppointment extends Document {
   barber: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
-  service: mongoose.Types.ObjectId;
+  service: string;
   appointmentDate: Date;
   appointmentTime: string;
   status: "pending" | "confirmed" | "completed" | "cancelled";
@@ -17,7 +17,7 @@ export interface IAppointment extends Document {
 const AppointmentSchema: Schema = new Schema({
   barber: { type: mongoose.Types.ObjectId, ref: "User", required: true },
   user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-  service: { type: mongoose.Types.ObjectId, ref: "Service" , required: true },
+  service: { type: String , required: true },
   appointmentDate: { type: Date, required: true },
   appointmentTime: { type: String, required: true },
   status: {

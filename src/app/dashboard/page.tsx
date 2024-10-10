@@ -20,9 +20,11 @@ interface Appointment {
   appointmentDate: string | number | Date;
   barber: {
     username: string;
+    email: string;
   };
   user: {
     username: string;
+    email: string;
   };
 }
 
@@ -34,6 +36,7 @@ const Dashboard = () => {
 
   // State for pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentTodayAppointments, setcurrentTodayAppointments] = useState(1);
   const [appointmentsPerPage] = useState(10); // Number of appointments per page
 
   useEffect(() => {
@@ -130,8 +133,10 @@ const Dashboard = () => {
   const currentAppointments = Array.isArray(appointments)
     ? appointments.slice(startIndex, endIndex)
     : [];
+  const TodayAppoints = Array.isArray(todayAppointments)
+    ? todayAppointments.slice(startIndex, endIndex)
+    : [];
 
-  // Get the appointments for the current page
 
   return (
     <div className='px-5'>
@@ -183,22 +188,20 @@ const Dashboard = () => {
 
 </section>
 
-{/* 
-<section>
-        <StackedLineChart />
-</section>
-  */}
+
 
      
 
-     <section className='pb-10'>
+     <Card className='overflow-hidden'>
         
-      <h2>Today&apos;s Appointments: </h2>
+        <h2 className='text-lg p-3 font-bold text-blue-800'>Today&apos;s Appointments </h2>
         <table className="min-w-full border-collapse border border-gray-300">
           <thead>
             <tr>
               <th className="border border-gray-300 px-4 py-2">Barber</th>
+              <th className="border border-gray-300 px-4 py-2">Barber Email</th>
               <th className="border border-gray-300 px-4 py-2">User</th>
+              <th className="border border-gray-300 px-4 py-2">User Email</th>
               <th className="border border-gray-300 px-4 py-2">Service</th>
               <th className="border border-gray-300 px-4 py-2">Appointment Date</th>
               <th className="border border-gray-300 px-4 py-2">Appointment Time</th>
@@ -207,11 +210,13 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {todayAppointments.map((appointment) => (
+            {TodayAppoints.map((appointment) => (
               <tr key={appointment._id}>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.username || 'Unknown Barber'}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.email || 'Unknown Barber'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.username || 'Unknown User'}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "Unknown"}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.email || 'Unknown User'}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "No Services"}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
@@ -228,15 +233,34 @@ const Dashboard = () => {
           </tbody>
         </table>
 
-     </section>
-     <section>
+     </Card>
+      <div className="flex items-center justify-center space-x-4 mt-4">
+        <button
+          onClick={() => setcurrentTodayAppointments(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          Previous
+        </button>
+        <span> Page : {currentPage} of {totalPages} </span>
+        <button
+          onClick={() => setcurrentTodayAppointments(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentTodayAppointments === totalPages}
+          className={`px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-200 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          Next
+        </button>
+      </div>
+     <Card className='overflow-hidden mt-10'>
+        <h2 className='text-lg p-3 font-bold text-blue-800'>Total Appointments </h2>
 
-        <h2 className='text-lg font-bold text-blue-800'>Total Appointments </h2>
-        <table className="min-w-full border-collapse border border-gray-300 mt-2">
+        <table className="min-w-full border-collapse border border-gray-300 mt-2 rounded-lg">
           <thead>
             <tr>
               <th className="border border-gray-300 px-4 py-2">Barber</th>
+              <th className="border border-gray-300 px-4 py-2">Barber Email</th>
               <th className="border border-gray-300 px-4 py-2">User</th>
+              <th className="border border-gray-300 px-4 py-2">User Email</th>
               <th className="border border-gray-300 px-4 py-2">Service</th>
               <th className="border border-gray-300 px-4 py-2">Appointment Date</th>
               <th className="border border-gray-300 px-4 py-2">Appointment Time</th>
@@ -248,8 +272,10 @@ const Dashboard = () => {
             {currentAppointments.map((appointment) => (
               <tr key={appointment._id}>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.username || 'Unknown Barber'}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.barber?.email || 'Unknown Barber'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.username || 'Unknown User'}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.email || 'Unknown User'}</td>
+                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "No Services"}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
@@ -267,7 +293,7 @@ const Dashboard = () => {
           </tbody>
         </table>
 
-     </section>
+      </Card>
 
 
 
@@ -290,6 +316,7 @@ const Dashboard = () => {
           Next
         </button>
       </div>
+      
     </div>
   );
 };

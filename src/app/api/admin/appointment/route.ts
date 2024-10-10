@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
       appointmentDate,
       appointmentTime,
       barber,
+      status,
       feedback,
       rating,
     } = await request.json();
@@ -134,6 +135,7 @@ export async function POST(request: NextRequest) {
       appointmentDate,
       appointmentTime,
       appointmentType: "WalkIn", // Default value
+      status: status || "confirmed" , 
       feedback,
       rating,
     });

@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import HashLoader from "react-spinners/HashLoader";
 
 interface EditStaffFormProps {
     params: {
@@ -20,6 +22,9 @@ interface EditStaffFormProps {
 }
 
 const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
+    const router = useRouter();
+
+    const [loading, setLoading] = useState<boolean>(true);
     const [username, setUsername] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [role, setRole] = useState<string>("user");
@@ -44,6 +49,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
                     setRating(data.staff.rating !== null ? data.staff.rating : "");
                     setServices(data.staff.services || []);
                     console.log(data)
+                    setLoading(false);
                 } catch (error) {
                     console.error("Error fetching staff data:", error);
                     setErrorMessage("Could not fetch staff data. Please try again later.");
@@ -69,7 +75,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
         e.preventDefault();
-
+        setLoading(true);
         // Ensure optional fields are not undefined
         const updatedUser = {
             id,
@@ -97,14 +103,26 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
             if (!response.ok) {
                 throw new Error(responseData.message || "Failed to update user");
             }
-
-            alert("User updated successfully!");
+            router.push("/dashboard/staff");
         } catch (error) {
             console.error("Error updating user:", error);
             setErrorMessage("Could not update user. Please try again later.");
         }
     };
 
+    if (loading) {
+        return (
+            <p className="flex mx-auto h-screen w-screen justify-center items-center text-6xl">
+                <HashLoader
+                    color="#000"
+                    loading={loading}
+                    size={80}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </p>
+        );
+    }
 
 
     return (
@@ -173,7 +191,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
                     <CardContent>
                         <label>Services:</label>
                         {services.map((service, index) => (
-                            <div key={index} className="flex items-center">
+                            <div key={index} className="flex items-center mt-2">
                                 <Input
                                     id="userId"
                                     type="text"
