@@ -10,6 +10,7 @@ interface User {
     email: string;
     role: string;
     services: string;
+    isVerified: boolean;
 }
 
 const Dashboard: React.FC = () => {
@@ -32,7 +33,7 @@ const Dashboard: React.FC = () => {
             const response = await fetch("/api/admin/staff");
             if (!response.ok) throw new Error("Failed to fetch users");
             const data = await response.json();
-            console.log(data)
+            console.log("Staff Data",data)
             if (Array.isArray(data.staff)) {
                 setUsers(data.staff);
             } else {
@@ -89,6 +90,7 @@ const Dashboard: React.FC = () => {
                             <th className="border border-gray-300 px-4 py-2">Email</th>
                             <th className="border border-gray-300 px-4 py-2">service</th>
                             <th className="border border-gray-300 px-4 py-2">Role</th>
+                            <th className="border border-gray-300 px-4 py-2">Verified</th>
                             <th className="border border-gray-300 px-4 py-2">Actions</th>
                         </tr>
                     </thead>
@@ -99,6 +101,7 @@ const Dashboard: React.FC = () => {
                                 <td className="border border-gray-300 px-4 py-2">{user.email}</td>
                                 <td className="border border-gray-300 px-4 py-2">{user?.services}</td>
                                 <td className="border border-gray-300 px-4 py-2">{user.role}</td>
+                                <td className="border border-gray-300 px-4 py-2">{user.isVerified ? "Yes" : "No"}</td>
                                 <td className="border border-gray-300 px-4 py-2 flex justify-center items-center space-x-2">
                                     <Link href={`/dashboard/staff/${user._id}`} className="px-2 py-1 bg-yellow-500 text-white rounded">
                                         Edit

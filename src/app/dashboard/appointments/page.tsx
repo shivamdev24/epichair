@@ -11,7 +11,7 @@ interface Appointment {
   _id: string;
   barber: { username: string, email: string } | null;
   user: { email: string, username: string } ;
-  service: {name: string} | null;
+  service: { _id: string; name: string } | null; 
   appointmentDate: string;
   appointmentTime?: string;
   status: "pending" | "confirmed" | "completed" | "cancelled";
@@ -37,7 +37,7 @@ const Appointment = () => {
         }
 
         const data = await response.json();
-        console.log(data)
+        console.log( "appointments" , data)
         
         if (Array.isArray(data)) {
           setAppointments(data);
@@ -167,6 +167,10 @@ const Appointment = () => {
                       { appointment.barber?.email || "Unknown Barber"}
                     </td>
                     <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">{ appointment.service?.name || "No Services"}</td>
+                    {/* <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">
+                      {typeof appointment.service === "object" ? appointment.service?.name : appointment.service || "No Services"}
+                    </td> */}
+
                     <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
                       {new Date(appointment.appointmentDate).toLocaleDateString("en-IN", {
                         year: "numeric",

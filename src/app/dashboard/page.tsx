@@ -44,7 +44,7 @@ const Dashboard = () => {
       try {
         const response = await fetch('/api/admin/appointment');
         const data = await response.json();
-
+        console.log(data)
         if (Array.isArray(data)) {
           setAppointments(data);
         } else {
@@ -112,7 +112,7 @@ const Dashboard = () => {
       const data = await response.json();
 
       // Log the entire data object
-      console.log('Fetched Staff Data:', data);
+      console.log('Fetched Service Data:', data);
       
     };
 

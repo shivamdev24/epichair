@@ -50,9 +50,7 @@ export default function SignInPage() {
       // setErrorMessage(
       //   error.response?.data?.message || "An error occurred during login." // Display error message
       // );
-    } finally {
-      setLoading(false); // Ensure loading state is reset
-    }
+    } 
   };
 
   const onOtpLogin = async () => {

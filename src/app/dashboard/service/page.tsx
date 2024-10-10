@@ -183,7 +183,7 @@ const ServiceManagement = () => {
                 setServices([...services, createdService]); // Add new service to state
                 // Indicate success
                 setNewService({ name: '', description: '', price: 0, duration: 0 }); // Reset form
-                alert('Service Created Successfully.');
+                setIsModalOpen(false);
             } else {
                 console.error('Failed to create service:', response.statusText);
                 alert('Failed to create service.');

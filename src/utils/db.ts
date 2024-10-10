@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+// mongoose.set("debug", true);
 
 type ConnectionObject = {
   isConnected?: number;

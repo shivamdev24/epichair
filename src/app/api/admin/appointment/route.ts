@@ -12,47 +12,6 @@ db();
 
 
 
-// export async function GET(request: NextRequest) {
-
-//   try {
-//     // Verify user token
-//     const userId = verifyToken(request);
-//     console.log(userId);
-
-//     // Check if user is authenticated
-//     if (!userId) {
-//       return NextResponse.json(
-//         { message: "Authorization required to GET appointments." },
-//         { status: 401 }
-//       );
-//     }
-
-//     // Fetch all appointments from the database
-//     const appointments = await Appointment.find()
-//       .populate("barber")
-//       .populate("user")
-//       .exec();
-//       .populate("service")
-//       .catch((error) => {
-//         console.error("Error fetching appointments:", error);
-//         throw error; // This will allow the error to be caught in the catch block above
-//       });
-//     // Return the list of appointments
-
-
-
-    
-//     return NextResponse.json(appointments, { status: 200 });
-//   } catch (error) {
-//     console.error("Error while fetching appointments:", error);
-//     return NextResponse.json(
-//       { message: "Failed to fetch appointments." },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-
 
 
 
@@ -77,12 +36,18 @@ export async function GET(request: NextRequest) {
     const appointments = await Appointment.find()
       .populate("barber")
       .populate("user")
-      .populate("service");
+      .populate("service")
+      
 
 
-      if(!appointments){
-console.error("fetch error", appointments);
-      }
+
+      console.log(appointments);
+
+    // Check if appointments were fetched successfully
+    if (!appointments ) {
+      console.log("No appointments found.");
+      return NextResponse.json([], { status: 204 }); // No Content
+    }
 
     // Return the list of appointments, or an empty array if none found
     return NextResponse.json(appointments || [], { status: 200 });

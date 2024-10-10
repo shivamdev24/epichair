@@ -274,7 +274,6 @@
 
 
 
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -313,6 +312,11 @@ const NewAppointment = () => {
     const [appointmentType, setAppointmentType] = useState<"inApp" | "WalkIn">("inApp");
     const [feedback, setFeedback] = useState("");
     const [rating, setRating] = useState<number | null>(null);
+
+    // Normalize service name by converting to lowercase and removing spaces and hyphens
+    const normalizeServiceName = (serviceName: string) => {
+        return serviceName.toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
+    };
 
     // Fetch services
     useEffect(() => {
@@ -354,58 +358,35 @@ const NewAppointment = () => {
         fetchBarbers();
     }, []);
 
-    // // Filter barbers based on selected service
-    // const handleServiceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     const selectedService = event.target.value;
-    //     setSelectedService(selectedServiceId);
-
-    //     // Filter barbers based on selected service
-    //     const matchedBarbers = barbers.filter((barber) =>
-    //         barber.services.includes(selectedServiceId)
-    //     );
-    //     setFilteredBarbers(matchedBarbers);
-    //     setSelectedBarber(""); // Reset the selected barber when service changes
-    // };
-    const normalizeServiceName = (serviceName: string) =>
-        serviceName.toLowerCase().replace(/\s+/g, '').replace(/-/g, '');
-
+    // Filter barbers based on selected service
     const handleServiceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedServiceName = normalizeServiceName(
-            event.target.options[event.target.selectedIndex].text
-        );
+        const selectedServiceId = event.target.value;
+        setSelectedService(selectedServiceId);
 
-        setSelectedService(selectedServiceName);
-        console.log("Selected Service Name:", selectedServiceName);
+        // Fetch services data from the API (consider caching or fetching only once)
+        const fetchedServices = services;
+        console.log("Fetched Services:", fetchedServices);
 
-        // Ensure barbers array has content before filtering
-        if (barbers.length === 0) {
-            console.log("Barbers Array is empty");
-            setFilteredBarbers([]); // No matched barbers
-            setSelectedBarber(""); // Reset the selected barber
+        // Find the selected service by ID
+        const selectedService = fetchedServices.find((service) => service._id === selectedServiceId);
+        if (!selectedService) {
+            console.log("Selected service not found");
             return;
         }
+        const selectedServiceName = selectedService.name;
+        console.log("Selected Service Name:", selectedServiceName);
 
-        console.log("Barbers Array:", barbers);
-
+        // Filter barbers based on selected service
         const matchedBarbers = barbers.filter((barber) => {
-            const normalizedServices = barber.services.map(service =>
+            const normalizedBarberServices = barber.services.map(service =>
                 normalizeServiceName(service)
             );
-
-            console.log("Normalized Barber Services:", normalizedServices);
-
-            return barber.role === "staff" && normalizedServices.includes(selectedServiceName);
+            return barber.role === "staff" && normalizedBarberServices.includes(normalizeServiceName(selectedServiceName));
         });
-
         console.log("Matched Barbers:", matchedBarbers);
         setFilteredBarbers(matchedBarbers);
         setSelectedBarber(""); // Reset the selected barber when service changes
     };
-
-
-
-
-
 
     const createAppointment = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -474,7 +455,7 @@ const NewAppointment = () => {
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                     required
                                 >
-                                    <option value="" >Select a service</option>
+                                    <option value="" disabled>Select a service</option>
                                     {services.map((service) => (
                                         <option key={service._id} value={service._id}>
                                             {service.name}

@@ -12,6 +12,7 @@ interface User {
     _id: string;
     email: string;
     role: string;
+    isVerified: boolean;
     username: string; // Assuming you have a username field
 }
 
@@ -90,6 +91,7 @@ const Dashboard = () => {
                             <th className="border border-gray-300 px-4 py-2">Username</th> {/* Added Username */}
                             <th className="border border-gray-300 px-4 py-2">Email</th>
                             <th className="border border-gray-300 px-4 py-2">Role</th>
+                            <th className="border border-gray-300 px-4 py-2">Verifief</th>
                             <th className="border border-gray-300 px-4 py-2">Actions</th>
                         </tr>
                     </thead>
@@ -97,9 +99,10 @@ const Dashboard = () => {
                         {currentUsers.map(user => (
                             <tr key={user._id}>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user._id}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{user.username}</td> {/* Display Username */}
+                                <td className="border border-gray-300 px-4 py-4 text-center">{user.username || "Not Updated"}</td> {/* Display Username */}
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.email}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.role}</td>
+                                <td className="border border-gray-300 px-4 py-4 text-center">{user.isVerified ? "Yes" : "No"}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">
                                     <button
                                         onClick={() => handleDeleteUser(user._id)}
