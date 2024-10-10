@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
+import User from "./User";
+import Service from "./Service";
 
 // Define the Appointment interface
 export interface IAppointment extends Document {
-  barber: mongoose.Types.ObjectId;
-  user: mongoose.Types.ObjectId;
-  service: mongoose.Types.ObjectId;
+  barber: mongoose.Schema.Types.ObjectId;
+  user: mongoose.Schema.Types.ObjectId;
+  service: mongoose.Schema.Types.ObjectId;
   appointmentDate: Date;
   appointmentTime: string;
   status: "pending" | "confirmed" | "completed" | "cancelled";
@@ -16,9 +18,17 @@ export interface IAppointment extends Document {
 // Define the appointment schema
 const AppointmentSchema: Schema = new Schema(
   {
-    barber: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-    user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-    service: { type: mongoose.Types.ObjectId, ref: "Service" , required: true },
+    barber: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: User,
+      required: true,
+    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: User, required: true },
+    service: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Service,
+      required: true,
+    },
     appointmentDate: { type: Date, required: true },
     appointmentTime: { type: String, required: true },
     status: {

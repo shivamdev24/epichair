@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Document,  Schema } from "mongoose";
 
 // Define the Service interface
 interface IService extends Document {
@@ -36,8 +36,12 @@ const ServiceSchema: Schema<IService> = new Schema(
 );
 
 // Create the Service model
-const Service: Model<IService> =
-  (mongoose.models.Service as mongoose.Model<IService>) ||
-  mongoose.model<IService>("Service", ServiceSchema);
+// const Service:  =
+//   (mongoose.models.Service as mongoose.Model<IService>) ||
+//   mongoose.model<IService>("Service", ServiceSchema);
+
+const Service = 
+ mongoose.models.Service || mongoose.model<IService>("Service", ServiceSchema);
+
 
 export default Service;

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
-import Service from "@/models/Service";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import Service from "@/models/Service";
 
 // Connect to the database
 db();

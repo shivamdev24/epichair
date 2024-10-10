@@ -39,15 +39,15 @@ export async function GET(request: NextRequest) {
       .populate("service")
       
 
+      if (!appointments ) {
+        console.log("No appointments found.", appointments);
+        return NextResponse.json([], { status: 204 }); // No Content
+      }
 
 
       console.log(appointments);
 
     // Check if appointments were fetched successfully
-    if (!appointments ) {
-      console.log("No appointments found.");
-      return NextResponse.json([], { status: 204 }); // No Content
-    }
 
     // Return the list of appointments, or an empty array if none found
     return NextResponse.json(appointments || [], { status: 200 });
