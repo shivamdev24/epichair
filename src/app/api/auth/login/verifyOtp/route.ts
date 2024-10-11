@@ -125,15 +125,31 @@ const isOtpValid = await bcrypt.compare(otp, user.otp);
 
     // If the user is already verified
     if (!user.isVerified) {
-      return NextResponse.json(
-        { message: "User is already verified." },
-        { status: 400 } // Change to 400 for a better user experience
+      // Mark user as verified
+      user.isVerified = true; // Update the isVerified field
+      await user.save(); // Save the updated user
+
+
+      const tokenData = { id: user._id, email: user.email, role: user.role };
+      const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
+        expiresIn: "1d",
+      });
+
+      const response = NextResponse.json(
+        { message: "User is Verified and Login successfully.", role: user.role, token },
+        { status: 200 }
       );
+
+      response.cookies.set("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 86400, // 30d
+      });
+
+      return response;
     }
 
-    // Mark user as verified
-    user.isVerified = true; // Update the isVerified field
-    await user.save(); // Save the updated user
 
     const tokenData = { id: user._id, email: user.email, role: user.role };
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {

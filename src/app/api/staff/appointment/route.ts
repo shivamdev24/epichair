@@ -7,42 +7,34 @@ db();
 
 
 
-// created by user
 export async function GET(request: NextRequest) {
   try {
+    // Verify token and get the user ID
     const userId = verifyToken(request);
-    console.log(userId);
+    console.log("User ID from token:", userId);
 
     if (!userId) {
       return NextResponse.json(
-        { message: "Authorization required to GET an appointment." },
+        { message: "Authorization required to fetch appointments." },
         { status: 401 }
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const appointmentId = searchParams.get("id");
+    // Fetch all appointments for the logged-in user
+    const appointments = await Appointment.find({ user: userId })
+      .populate("barber") // Populate barber information if needed
+      .populate("service") // Populate barber information if needed
+      .populate("user"); // Populate user information if needed
 
-    if (appointmentId) {
-      const appointment = await Appointment.findById(appointmentId)
-        .populate("barber")
-        .populate("user");
-
-      if (!appointment) {
-        return NextResponse.json(
-          { error: "Appointment not found." },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(appointment, { status: 200 });
-    } else {
-      const appointments = await Appointment.find()
-        .populate("barber")
-        .populate("user");
-
-      return NextResponse.json(appointments, { status: 200 });
+    if (!appointments || appointments.length === 0) {
+      return NextResponse.json(
+        { message: "No appointments found for this user." },
+        { status: 404 }
+      );
     }
+
+    // Return the appointments for the logged-in user
+    return NextResponse.json(appointments, { status: 200 });
   } catch (error) {
     console.error("Error while fetching appointments:", error);
     return NextResponse.json(
