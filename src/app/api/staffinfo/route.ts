@@ -19,11 +19,13 @@ export async function GET(request: NextRequest) {
       {
         message: "Staff members retrieved successfully.",
         staff: staffMembers.map((user) => ({
-            id: user._id,
-            email: user.email,
-            name: user.username,
-            role: user.role,
-            Service: user.services,
+          id: user._id,
+          email: user.email,
+          name: user.username,
+          image_url: user.image_url,
+          public_id: user.public_id,
+          OtpExpiry: user.otpExpiry,
+          role: user.role,
         })),
       },
       { status: 200 }
