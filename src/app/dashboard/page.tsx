@@ -142,44 +142,44 @@ const Dashboard = () => {
     <div className='px-5'>
 
 
-<section className='py-10 flex justify-evenly'>
-        <Card className='w-72'>
+<section className='py-10 flex flex-col md:flex-row items-center gap-4 justify-evenly'>
+        <Card className='w-full text-center md:w-72'>
           <CardHeader>
             <CardTitle>Today&apos;s Appointment</CardTitle>
             
           </CardHeader>
-          <CardContent className='text-lg'>
+          <CardContent className='text-xl font-bold text-blue-500'>
             {todayAppointments.length}
           </CardContent>
           
         </Card>
         
-        <Card className='w-72'>
+        <Card className='w-full text-center md:w-72'>
           <CardHeader>
             <CardTitle>Total Appointment</CardTitle>
             
           </CardHeader>
-          <CardContent className='text-lg'>
+          <CardContent className='text-xl font-bold text-blue-500'>
             {appointments.length}
           </CardContent>
           
         </Card>
-        <Card className='w-72'>
+        <Card className='w-full text-center md:w-72'>
           <CardHeader>
             <CardTitle>Total Users</CardTitle>
             
           </CardHeader>
-          <CardContent className='text-lg'>
+          <CardContent className='text-xl font-bold text-blue-500'>
             {user}
           </CardContent>
           
         </Card>
-        <Card className='w-72'>
+        <Card className='w-full text-center md:w-72'>
           <CardHeader>
             <CardTitle>Total Staff</CardTitle>
             
           </CardHeader>
-          <CardContent className='text-lg'>
+          <CardContent className='text-xl font-bold text-blue-500'>
             {staff}
           </CardContent>
           
@@ -192,7 +192,7 @@ const Dashboard = () => {
 
      
 
-     <Card className='overflow-hidden'>
+     <Card className='overflow-hidden overflow-x-auto'>
         
         <h2 className='text-lg p-3 font-bold text-blue-800'>Today&apos;s Appointments </h2>
         <table className="min-w-full border-collapse border border-gray-300">
@@ -251,7 +251,7 @@ const Dashboard = () => {
           Next
         </button>
       </div>
-     <Card className='overflow-hidden mt-10'>
+      <Card className='overflow-hidden overflow-x-auto mt-10'>
         <h2 className='text-lg p-3 font-bold text-blue-800'>Total Appointments </h2>
 
         <table className="min-w-full border-collapse border border-gray-300 mt-2 rounded-lg">

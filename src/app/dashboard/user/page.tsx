@@ -83,7 +83,7 @@ const Dashboard = () => {
                 </Card>
             </section>
 
-            <section className='pb-10'>
+            <Card className=' overflow-hidden overflow-x-auto'>
                 <table className="min-w-full border-collapse border border-gray-300">
                     <thead>
                         <tr>
@@ -117,6 +117,7 @@ const Dashboard = () => {
                 </table>
 
                 {/* Pagination Controls */}
+            </Card>
                 <div className="flex justify-center mt-4">
                     {Array.from({ length: totalPages }, (_, index) => (
                         <button
@@ -128,7 +129,6 @@ const Dashboard = () => {
                         </button>
                     ))}
                 </div>
-            </section>
         </div>
     );
 };

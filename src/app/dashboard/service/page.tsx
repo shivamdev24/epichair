@@ -38,9 +38,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, newService, se
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-5 rounded-lg shadow-lg">
-                <Card className='w-[50rem] relative'>
+        <div className="fixed w-screen inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className=" p-5 rounded-lg ">
+                <Card className='w-full p-5 shadow-lg md:w-[50rem] relative'>
                     <button onClick={onClose} className="mt-2 absolute top-1 right-5  px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">Close</button>
                     <CardHeader>
                         <CardTitle>Create New Services</CardTitle>
@@ -206,12 +206,12 @@ const ServiceManagement = () => {
 
     return (
         <div className='px-5'>
-            <section className='py-10 flex justify-between'>
+            <section className='py-10 flex gap-4 flex-col-reverse md:flex-row justify-between'>
                 <Card className='w-72'>
                     <CardHeader>
                         <CardTitle>Total Services</CardTitle>
                     </CardHeader>
-                    <CardContent className='text-lg'>
+                    <CardContent className='text-xl font-bold text-blue-500'>
                         {services.length}
                     </CardContent>
                 </Card>
@@ -232,7 +232,7 @@ const ServiceManagement = () => {
                 </div>
             </section>
 
-            <section className='pb-10'>
+            <Card className=' overflow-hidden overflow-x-auto'>
                 <table className="min-w-full border-collapse border border-gray-300">
                     <thead>
                         <tr>
@@ -266,6 +266,7 @@ const ServiceManagement = () => {
                 </table>
 
                 {/* Pagination Controls */}
+            </Card>
                 <div className="flex justify-center mt-4">
                     {Array.from({ length: totalPages }, (_, index) => (
                         <button
@@ -277,7 +278,6 @@ const ServiceManagement = () => {
                         </button>
                     ))}
                 </div>
-            </section>
         </div>
     );
 };

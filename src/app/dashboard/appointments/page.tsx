@@ -151,9 +151,9 @@ const Appointment = () => {
                   <th className="px-6 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody >
                 {currentAppointments.map((appointment) => (
-                  <tr key={appointment._id}>
+                  <tr key={appointment._id} >
                     <td className="px-6 text-center  py-4 whitespace-no-wrap border border-gray-300">
                       { appointment.user?.username || "No User"}
                     </td>
@@ -192,7 +192,7 @@ const Appointment = () => {
                     <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">
                       {appointment.rating !== undefined ? appointment.rating : "Not Rated"}
                     </td>
-                    <td className="px-6 py-3 border border-gray-300 text-left text-sm leading-4 text-gray-600 tracking-wider space-x-2">
+                    <td className=" px-7 py-4 border gap-3 border-gray-300 text-gray-600 flex items-center flex-col ">
                       <Link
                         href={`/dashboard/appointments/${appointment._id}`}
                         className="px-2 py-1 bg-yellow-500 text-white rounded"

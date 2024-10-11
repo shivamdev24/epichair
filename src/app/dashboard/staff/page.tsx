@@ -1,7 +1,9 @@
 "use client";
 
+import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import HashLoader from "react-spinners/HashLoader";
 
 // Sample User interface (define it according to your needs)
 interface User {
@@ -70,19 +72,35 @@ const Dashboard: React.FC = () => {
     const currentUsers = users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage);
     const totalPages = Math.ceil(users.length / usersPerPage);
 
+
+
+    if (loading) {
+        return (
+            <p className="flex mx-auto h-screen w-screen justify-center items-center text-6xl">
+                <HashLoader
+                    color="#000"
+                    loading={loading}
+                    size={80}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </p>
+        );
+    }
+
+
     return (
         <div className="p-6">
             <Link href={`/dashboard/staff/newStaff`}
                 className="mb-4 bg-blue-500 text-white px-4 py-2 rounded"
                 
             >
-                Create User
+                Create New Staff
             </Link>
 
-            {loading && <p>Loading...</p>}
             {error && <p className="text-red-500">{error}</p>}
 
-            <section className="overflow-x-auto mt-6">
+            <Card className="overflow-x-auto mt-6">
                 <table className="min-w-full bg-white border border-gray-300">
                     <thead className="bg-gray-200">
                         <tr>
@@ -102,7 +120,7 @@ const Dashboard: React.FC = () => {
                                 <td className="border border-gray-300 px-4 py-2">{user?.services}</td>
                                 <td className="border border-gray-300 px-4 py-2">{user.role}</td>
                                 <td className="border border-gray-300 px-4 py-2">{user.isVerified ? "Yes" : "No"}</td>
-                                <td className="border border-gray-300 px-4 py-2 flex justify-center items-center space-x-2">
+                                <td className=" px-7 py-4 border gap-3 border-gray-300 text-gray-600 flex items-center flex-col ">
                                     <Link href={`/dashboard/staff/${user._id}`} className="px-2 py-1 bg-yellow-500 text-white rounded">
                                         Edit
                                     </Link>
@@ -114,7 +132,7 @@ const Dashboard: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
-            </section>
+            </Card>
 
             <div className="mt-4 justify-center flex ">
                 {Array.from({ length: totalPages }, (_, index) => (

@@ -4,7 +4,7 @@
 "use client";
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useRouter } from "next/navigation";
 import Axios from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,25 +19,12 @@ export default function SignInPage() {
     email: "",
     password: "",
   });
-
-  const [buttonDisabled, setButtonDisabled] = useState({
-    login: true,
-    otp: true,
-  });
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
-  useEffect(() => {
-    if (user.email.length > 0 && user.password.length > 0) {
-      setButtonDisabled({ login: false, otp: false }); // Enable both buttons
-    } else if (user.email.length > 0 && user.password.length === 0) {
-      setButtonDisabled({ login: true, otp: false }); // Enable only OTP button
-    } else {
-      setButtonDisabled({ login: true, otp: true }); // Disable both buttons
-    }
-  }, [user]);
+ 
 
   const onSignIn = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent the default form submission
@@ -46,14 +33,14 @@ export default function SignInPage() {
     setErrorMessage(""); // Clear any previous error messages
 
     try {
-      const response = await Axios.post("/api/auth/admin", user);
+      const response = await Axios.post("/api/auth/signup/admin", user);
       console.log("Sent verification Otp Successfully.", response.data);
       router.push(`/auth/signup/verifyotp?email=${encodeURIComponent(user.email)}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error("Login failed:", error); // Log the error for debugging
+      console.error("Signup failed:", error); // Log the error for debugging
       setErrorMessage(
-        error.response?.data?.message || "An error occurred during login." // Display error message
+        error.response?.data?.message || "An error occurred during Signup." // Display error message
       );
     } finally {
       setLoading(false); // Ensure loading state is reset
@@ -66,7 +53,7 @@ export default function SignInPage() {
     <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
       <div>
         {loading ? (
-          <p className="flex mx-auto h-screen justify-center items-center text-6xl">
+          <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center text-6xl">
             <HashLoader
               color="#000"
               loading={loading}
@@ -103,9 +90,9 @@ export default function SignInPage() {
               <Button
                 className="w-full"
                 type="submit"
-                disabled={buttonDisabled.login}
+                
               >
-                {buttonDisabled.login ? "Required Field" : "Signup"}
+                Signup
               </Button>
             </CardContent>
            

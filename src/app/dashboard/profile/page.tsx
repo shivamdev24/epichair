@@ -306,9 +306,9 @@ export default function ProfilePage() {
       </Link>
 
       <div className="m-4 w-full flex justify-center itmes-center border-none mx-auto mt-12">
-        <CardHeader>
-          <Image src={user.image_url} width={400} height={400} className=" w-56 h-56 object-center object-cover aspect-square border rounded-lg" alt="profile image" />
-          <Button onClick={() => setIsPopupOpen(true)} className="mt-4 bg-blue-500 text-white">
+        <CardHeader >
+          <Image src={user.image_url} width={1000} height={1000} className=" w-40 h-40 object-center object-cover aspect-square border rounded-lg" alt="profile image" />
+          <Button onClick={() => setIsPopupOpen(true)} className="mt-4 w-40 bg-blue-500 text-white">
             Change Profile Image
           </Button>
         </CardHeader>
@@ -347,12 +347,12 @@ export default function ProfilePage() {
           <Input id="email" readOnly value={user.email} placeholder="Email" />
         </CardContent>
 
-        <CardFooter className="flex w-full flex-col md:flex-row justify-between px-5">
+        <CardFooter className="flex w-full flex-col md:flex-row gap-2 md:gap-4 justify-end px-5">
           <p>Want to update?
+          </p>
             <Button onClick={handleClick} className="w-full md:w-32 bg-green-500 mt-4 md:mt-0">
               Update User
             </Button>
-          </p>
 
           <Button onClick={handleDelete} className="w-full md:w-40 bg-red-500 hover:bg-red-600 mt-4 md:mt-0">
             Account Delete

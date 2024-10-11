@@ -13,6 +13,12 @@ import {
   MenubarTrigger,
 } from "@/components/ui/menubar";
 import { useEffect, useState } from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+
 
 
 
@@ -79,13 +85,34 @@ const Sidebar = () => {
 
   return (
     <div>
-      <div className="w-full h-20 bg-gray-900 text-white drop-shadow-md flex justify-between px-5 items-center">
-        <div className="w-full flex justify-start px-5 items-center">
-          <div className="p-4 ">
-            {/* Logo */}
-            <Link href="/dashboard">
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-command"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" /></svg></Link>
-          </div>
+      <div className="w-screen h-20 bg-gray-900 text-white drop-shadow-md flex justify-between px-5 items-center">
+         
+
+
+        <Sheet >
+          
+          <SheetTrigger> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg></SheetTrigger>
+         
+            
+          <SheetContent>
+            <ul className="flex flex-col gap-3 mt-6">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={`block py-2 px-4 ${pathname === item.href ? "font-bold text-yellow-600" : ""
+                      }`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            
+          </SheetContent>
+        </Sheet>
+
+        <div className="w-full flex justify-start px-5 items-center"><div className="hidden md:block"> <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-command"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" /></svg></div>
           <div className="p-4 hidden md:block">
             <ul className="flex ">
               {navItems.map((item) => (
@@ -108,8 +135,8 @@ const Sidebar = () => {
           <Menubar>
             <MenubarMenu >
               <MenubarTrigger className="rounded-full bg-none">
-                <Avatar>
-                  <AvatarImage src={profile?.image_url || '/default-avatar.png'} />
+                <Avatar className="border-2">
+                  <AvatarImage src={profile?.image_url || '/default-avatar.png'} className="object-cover object-center" />
                   <AvatarFallback>P</AvatarFallback>
                 </Avatar>
               </MenubarTrigger>
