@@ -17,16 +17,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: "Staff members retrieved successfully.",
-        staff: staffMembers.map((user) => ({
-          id: user._id,
-          email: user.email,
-          name: user.username,
-          image_url: user.image_url,
-          public_id: user.public_id,
-          OtpExpiry: user.otpExpiry,
-          role: user.role,
-        })),
+        message: "Staff members retrieved successfully.",staffMembers
+        
       },
       { status: 200 }
     );
