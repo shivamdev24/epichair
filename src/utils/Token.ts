@@ -3,8 +3,20 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const verifyToken = (request: NextRequest) => {
   
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+  if (!authHeader) {
+    throw new Error("Authorization token is required.");
+  }
+
+  // Check Authorization header first
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+  
  
-  const token = request.cookies.get("token")?.value || "";
 
   if (!token) {
     console.warn("No authorization token found.");

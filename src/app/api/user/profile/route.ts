@@ -77,15 +77,16 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.username,
-          image_url: user.image_url,
-          public_id: user.public_id,
-          OtpExpiry: user.otpExpiry,
-          role: user.role,
-        },
+        // user: {
+        //   id: user._id,
+        //   email: user.email,
+        //   name: user.username,
+        //   image_url: user.image_url,
+        //   public_id: user.public_id,
+        //   OtpExpiry: user.otpExpiry,
+        //   role: user.role,
+        // },
+        user,
       },
       { status: 200 }
     );

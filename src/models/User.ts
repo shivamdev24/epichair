@@ -10,10 +10,9 @@ export interface User extends Document {
   isVerified: boolean;
   role: "user" | "staff" | "admin";
   password?: string;
-  feedback?: string; // Optional feedback field
-  rating?: number; // Optional rating field
-  services?: string[]; // Optional services field
-  // skills?: string[]; // Optional skills field
+  feedback?: string; 
+  rating?: number; 
+  services?: string[]; 
   image_url?: string;
   public_id?: string;
 }
