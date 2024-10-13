@@ -8,12 +8,14 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 
+
 interface User {
     _id: string;
     email: string;
     role: string;
     isVerified: boolean;
     username: string; // Assuming you have a username field
+    image_url: string;
 }
 
 const Dashboard = () => {
@@ -26,6 +28,7 @@ const Dashboard = () => {
             try {
                 const response = await fetch('/api/admin/user');
                 const data = await response.json();
+                console.log("User List : ",data)
                 if (data.User && Array.isArray(data.User)) {
                     setUsers(data.User);
                 } else {
@@ -87,9 +90,9 @@ const Dashboard = () => {
                 <table className="min-w-full border-collapse border border-gray-300">
                     <thead>
                         <tr>
+                            <th className="border border-gray-300 px-4 py-2">Email</th>
                             <th className="border border-gray-300 px-4 py-2">User ID</th>
                             <th className="border border-gray-300 px-4 py-2">Username</th> {/* Added Username */}
-                            <th className="border border-gray-300 px-4 py-2">Email</th>
                             <th className="border border-gray-300 px-4 py-2">Role</th>
                             <th className="border border-gray-300 px-4 py-2">Verifief</th>
                             <th className="border border-gray-300 px-4 py-2">Actions</th>
@@ -98,11 +101,18 @@ const Dashboard = () => {
                     <tbody>
                         {currentUsers.map(user => (
                             <tr key={user._id}>
+                                
+                                <td className="border border-gray-300 px-4 py-4 text-center">{user.email}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user._id}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.username || "Not Updated"}</td> {/* Display Username */}
-                                <td className="border border-gray-300 px-4 py-4 text-center">{user.email}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.role}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{user.isVerified ? "Yes" : "No"}</td>
+                                <td
+                                    className={`border border-gray-300 px-4 text-white py-4 text-center ${user.isVerified ? "bg-green-500" : "bg-red-500"
+                                        }`}
+                                >
+                                    {user.isVerified ? "Yes" : "No"}
+                                </td>
+
                                 <td className="border border-gray-300 px-4 py-4 text-center">
                                     <button
                                         onClick={() => handleDeleteUser(user._id)}

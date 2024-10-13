@@ -48,7 +48,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
                     setFeedback(data.staff.feedback);
                     setRating(data.staff.rating !== null ? data.staff.rating : "");
                     setServices(data.staff.services || []);
-                    console.log(data)
+                    // console.log(data)
                     setLoading(false);
                 } catch (error) {
                     console.error("Error fetching staff data:", error);
@@ -88,7 +88,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
         };
 
         // Log data being submitted
-        console.log("Submitting user data:", updatedUser);
+        // console.log("Submitting user data:", updatedUser);
 
         try {
             const response = await fetch(`/api/admin/staff?id=${id}`, {
@@ -98,7 +98,7 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
             });
 
             const responseData = await response.json();
-            console.log("API Response Data:", responseData);
+            // console.log("API Response Data:", responseData);
 
             if (!response.ok) {
                 throw new Error(responseData.message || "Failed to update user");

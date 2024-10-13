@@ -8,11 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 // import StackedLineChart from '@/components/dashboard/StackedLineChart';
 
 
 interface Appointment {
-  appointmentTime: ReactNode;
+  appointmentTime: string;
   status: string;
   appointmentType: ReactNode;
   _id: string;
@@ -44,7 +46,7 @@ const Dashboard = () => {
       try {
         const response = await fetch('/api/admin/appointment');
         const data = await response.json();
-        console.log(data)
+        // console.log(data)
         if (Array.isArray(data)) {
           setAppointments(data);
         } else {
@@ -73,13 +75,14 @@ const Dashboard = () => {
         const data = await response.json();
 
         // Log the entire data object
-        console.log('Fetched User Data:', data);
+        // console.log('Fetched User Data:', data);
 
         // Access the User key to get the array of users
         if (data.User && Array.isArray(data.User)) {
           setUser(data.User.length);
         } else {
-          console.warn('Expected User to be an array but got:', data.User);
+          // console.warn('Expected User to be an array but got:', data.User);
+          console.log('Expected User to be an array but got: something else');
           setUser(0); // Or handle as needed
         }
 
@@ -93,13 +96,13 @@ const Dashboard = () => {
         const data = await response.json();
 
         // Log the entire data object
-        console.log('Fetched Staff Data:', data);
+        // console.log('Fetched Staff Data:', data);
 
         // Correctly access the staff property
         if (data.staff && Array.isArray(data.staff)) {
           setStaff(data.staff.length); // Or rename this to something like setStaffCount
         } else {
-          console.warn('Expected staff to be an array but got:', data.staff);
+          // console.warn('Expected staff to be an array but got:', data.staff);
           setStaff(0); // Handle as needed
         }
 
@@ -109,10 +112,11 @@ const Dashboard = () => {
     };
     const callservice = async () => {
       const response = await fetch('/api/admin/service');
-      const data = await response.json();
+       await response.json();
+      // const data = await response.json();
 
       // Log the entire data object
-      console.log('Fetched Service Data:', data);
+      // console.log('Fetched Service Data:', data);
       
     };
 
@@ -122,8 +126,38 @@ const Dashboard = () => {
     fetchStaff();
     callservice();
   }, []);
-  
 
+  const deleteAppointment = async (appointmentId: string) => {
+    try {
+      const response = await fetch(`/api/admin/appointment?id=${appointmentId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        // console.log(`Error deleting appointment. Status: ${response.status}`);
+        const errorMessage = await response.text();
+        console.error(`Error message from server: ${errorMessage}`);
+        throw new Error(`Failed to delete appointment: ${errorMessage}`);
+      }
+
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((appointment) => appointment._id !== appointmentId)
+      );
+
+      console.log("Appointment deleted successfully");
+    } catch (err) {
+      console.error("Error deleting appointment:", err);
+      console.warn("An error occurred while deleting the appointment");
+    }
+  };
+  
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    let hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12; // Convert to 12-hour format, handle '0' as '12'
+    return `${hour}:${minutes} ${ampm}`;
+  };
   // Calculate the total number of pages
   const totalPages = Math.ceil(appointments.length / appointmentsPerPage);
 
@@ -206,7 +240,8 @@ const Dashboard = () => {
               <th className="border border-gray-300 px-4 py-2">Appointment Date</th>
               <th className="border border-gray-300 px-4 py-2">Appointment Time</th>
               <th className="border border-gray-300 px-4 py-2">Status</th>
-              <th className="border border-gray-300 px-4 py-2">Appointment Type</th>
+              <th className="border border-gray-300 px-2 py-2">Appointment Type</th>
+              <th className="px-6 py-3 border border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -218,7 +253,10 @@ const Dashboard = () => {
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.email || 'Unknown User'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "No Services"}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
+                {/* <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td> */}
+                <td className="border border-gray-300 px-4 py-4 text-center">
+                  {formatTime(appointment.appointmentTime)}
+                </td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
                   appointment.status === "confirmed" ? "bg-green-500" :
                     appointment.status === "completed" ? "bg-blue-500" :
@@ -228,6 +266,23 @@ const Dashboard = () => {
                   {appointment.status}
                 </td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentType}</td>
+
+                <td className=" px-7 py-4 border gap-3 border-gray-300 text-gray-300 flex items-center justify-center ">
+                  <Link
+                    href={`/dashboard/appointments/${appointment._id}`}
+                    
+                  >
+                    <Button className=" bg-yellow-500 text-white rounded">
+                      Edit
+                    </Button>
+                  </Link>
+                  <Button
+                    onClick={() => deleteAppointment(appointment._id)}
+                    className="px-2 py-1 bg-red-500 text-white rounded"
+                  >
+                    Delete
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -277,7 +332,10 @@ const Dashboard = () => {
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.user?.email || 'Unknown User'}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.service?.name || "No Services"}</td>
                 <td className="border border-gray-300 px-4 py-4 text-center">{new Date(appointment.appointmentDate).toLocaleDateString()}</td>
-                <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td>
+                {/* <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentTime}</td> */}
+                <td className="border border-gray-300 px-4 py-4 text-center">
+                  {formatTime(appointment.appointmentTime)}
+                </td>
                 <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
                     appointment.status === "confirmed" ? "bg-green-500" :
                       appointment.status === "completed" ? "bg-blue-500" :
@@ -288,6 +346,7 @@ const Dashboard = () => {
                 </td>
 
                 <td className="border border-gray-300 px-4 py-4 text-center">{appointment.appointmentType}</td>
+               
               </tr>
             ))}
           </tbody>

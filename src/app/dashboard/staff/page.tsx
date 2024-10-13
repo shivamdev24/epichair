@@ -5,13 +5,16 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import HashLoader from "react-spinners/HashLoader";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 // Sample User interface (define it according to your needs)
 interface User {
     _id: string;
     username: string;
     email: string;
     role: string;
-    services: string;
+    services: string[];
+    image_url: string;
     isVerified: boolean;
 }
 
@@ -35,7 +38,7 @@ const Dashboard: React.FC = () => {
             const response = await fetch("/api/admin/staff");
             if (!response.ok) throw new Error("Failed to fetch users");
             const data = await response.json();
-            console.log("Staff Data",data)
+            // console.log("Staff Data",data)
             if (Array.isArray(data.staff)) {
                 setUsers(data.staff);
             } else {
@@ -105,6 +108,7 @@ const Dashboard: React.FC = () => {
                     <thead className="bg-gray-200">
                         <tr>
                             <th className="border border-gray-300 px-4 py-2">Username</th>
+                            <th className="border border-gray-300 px-4 py-2">Username</th>
                             <th className="border border-gray-300 px-4 py-2">Email</th>
                             <th className="border border-gray-300 px-4 py-2">service</th>
                             <th className="border border-gray-300 px-4 py-2">Role</th>
@@ -115,12 +119,22 @@ const Dashboard: React.FC = () => {
                     <tbody>
                         {currentUsers.map((user) => (
                             <tr key={user._id}>
-                                <td className="border border-gray-300 px-4 py-2">{user.username}</td>
-                                <td className="border border-gray-300 px-4 py-2">{user.email}</td>
-                                <td className="border border-gray-300 px-4 py-2">{user?.services}</td>
-                                <td className="border border-gray-300 px-4 py-2">{user.role}</td>
-                                <td className="border border-gray-300 px-4 py-2">{user.isVerified ? "Yes" : "No"}</td>
-                                <td className=" px-7 py-4 border gap-3 border-gray-300 text-gray-600 flex items-center flex-col ">
+                                <td className="border border-gray-300 px-4 py-2  "> <div className="flex justify-center items-center">
+                                    <Avatar className="">
+                                        <AvatarImage src={user?.image_url || 'Not Updated'} className="object-cover object-center" />
+                                        <AvatarFallback>P</AvatarFallback>
+                                    </Avatar></div></td>
+                                <td className="border border-gray-300 text-center px-4 py-2">{user.username ||  "Not Updated"}</td>
+                                <td className="border border-gray-300 text-center px-4 py-2">{user.email}</td>
+                               
+                                {/* <td className="border border-gray-300 text-center px-4 py-2">{user?.services || "Not Updated"}</td> */}
+                                <td className="border border-gray-300 text-center px-4 py-2">
+                                    {user?.services && user.services.length > 0 ? user.services.join(", ") : "Not Updated"}
+                                </td>
+
+                                <td className="border border-gray-300 text-center px-4 py-2">{user.role}</td>
+                                <td className="border border-gray-300 text-center px-4 py-2">{user.isVerified ? "Yes" : "No"}</td>
+                                <td className=" px-7 py-4 border gap-3 text-center border-gray-300 text-gray-600 flex items-center justify-center ">
                                     <Link href={`/dashboard/staff/${user._id}`} className="px-2 py-1 bg-yellow-500 text-white rounded">
                                         Edit
                                     </Link>

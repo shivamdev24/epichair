@@ -50,6 +50,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, newService, se
                     
                     <form onSubmit={onSubmit} className="mb-4">
                         <CardContent className='text-lg'>
+                            <label>Service Name : <span className="text-red-500">*</span> </label>
                             <input
                                 type="text"
                                 placeholder="Service Name"
@@ -60,6 +61,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, newService, se
                             />
                         </CardContent>
                         <CardContent className='text-lg'>
+                            <label>Description : </label>
                             <input
                                 type="text"
                                 placeholder="Description"
@@ -69,6 +71,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, newService, se
                             />
                         </CardContent>
                         <CardContent className='text-lg'>
+                            <label>Price : </label>
                             <input
                                 type="number"
                                 placeholder="Price"
@@ -78,6 +81,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit, newService, se
                             />
                         </CardContent>
                         <CardContent className='text-lg'>
+                            <label>Duration (min) : </label>
                             <input
                                 type="number"
                                 placeholder="Duration (min)"
@@ -131,13 +135,13 @@ const ServiceManagement = () => {
             try {
                 const response = await fetch('/api/admin/service');
                 const data = await response.json();
-                console.log('API response:', data); // Log the entire response
+                // console.log('API response:', data); // Log the entire response
 
                 // Check if data is an array directly
                 if (Array.isArray(data)) {
                     setServices(data);
                 } else {
-                    console.warn('Expected services to be an array but got:', data);
+                    console.warn('Expected services to be an array but got: undefined');
                 }
             } catch (error) {
                 console.error('Error fetching services:', error);
@@ -249,9 +253,17 @@ const ServiceManagement = () => {
                             <tr key={service._id}>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{service._id}</td>
                                 <td className="border border-gray-300 px-4 py-4 text-center">{service.name}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{service.description}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{service.price ?? 'N/A'}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{service.duration ?? 'N/A'}</td>
+                                <td className="border border-gray-300 px-4 py-4 text-center">
+                                    {service.description && service.description.trim() !== '' ? service.description : 'N/A'}
+                                </td>
+
+                                <td className="border border-gray-300 px-4 py-4 text-center">
+                                    {service.price && service.price > 0 ? service.price : 'N/A'}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-4 text-center">
+                                    {service.duration && service.duration > 0 ? service.duration : 'N/A'}
+                                </td>
+
                                 <td className="border border-gray-300 px-4 py-4 text-center">
                                     <button
                                         onClick={() => handleDeleteService(service._id)}

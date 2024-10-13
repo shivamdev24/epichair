@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     // Query to get all users with role 'staff'
     const Users = await User.find({ role: "user" });
 
-    return NextResponse.json({ User: Users }, { status: 200 });
+    return NextResponse.json({User: Users }, { status: 200 });
   } catch (error) {
     console.error("Error fetching staff users:", error);
     return NextResponse.json(

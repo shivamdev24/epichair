@@ -101,7 +101,7 @@ const AppointmentUpdate = () => {
         
         event.preventDefault();
         try {
-            const response = await axios.put(`/api/admin/appointment?id=${id}`, {
+           await axios.put(`/api/admin/appointment?id=${id}`, {
                 service: selectedService, // Use selectedService here
                 appointmentDate,
                 appointmentTime,
@@ -110,9 +110,18 @@ const AppointmentUpdate = () => {
                 feedback,
                 rating,
             });
+            // const response = await axios.put(`/api/admin/appointment?id=${id}`, {
+            //     service: selectedService, // Use selectedService here
+            //     appointmentDate,
+            //     appointmentTime,
+            //     status,
+            //     appointmentType,
+            //     feedback,
+            //     rating,
+            // });
 
 router.push("/dashboard/appointments");
-            console.log("Appointment updated successfully", response);
+            // console.log("Appointment updated successfully", response);
         } catch (err) {
             console.error("Error updating appointment:", err);
             setError("An error occurred while updating the appointment");
