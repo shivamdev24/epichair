@@ -1,42 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { verifyToken } from "@/utils/Token";
+// import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
-const verifyToken = (request: NextRequest) => {
-  const authHeader = request.headers.get("Authorization");
-  let token: string | null = null;
+// const verifyToken = (request: NextRequest) => {
+//   const authHeader = request.headers.get("Authorization");
+//   let token: string | null = null;
 
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
-  } else {
-    token = request.cookies.get("token")?.value || null;
-  }
+//   if (authHeader && authHeader.startsWith("Bearer ")) {
+//     token = authHeader.split(" ")[1];
+//   } else {
+//     token = request.cookies.get("token")?.value || null;
+//   }
 
-  if (!token) {
-    console.warn("No authorization token found.");
-    return null;
-  }
+//   if (!token) {
+//     console.warn("No authorization token found.");
+//     return null;
+//   }
 
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET || "default_secret_key"
-    );
+//   try {
+//     const decoded = jwt.verify(
+//       token,
+//       process.env.TOKEN_SECRET || "default_secret_key"
+//     );
 
-    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-      return (decoded as JwtPayload).id;
-    } else {
-      throw new Error("Invalid token payload.");
-    }
-  } catch (error) {
-    console.error("Token verification error:", { cause: error });
-    return null;
-  }
-};
+//     if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
+//       return (decoded as JwtPayload).id;
+//     } else {
+//       throw new Error("Invalid token payload.");
+//     }
+//   } catch (error) {
+//     console.error("Token verification error:", { cause: error });
+//     return null;
+//   }
+// };
 
 
 export async function PUT(request: NextRequest) {
