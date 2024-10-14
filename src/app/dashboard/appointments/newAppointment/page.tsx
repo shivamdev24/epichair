@@ -118,6 +118,17 @@ const NewAppointment = () => {
     const createAppointment = async (event: React.FormEvent) => {
         event.preventDefault();
         setLoading(true);
+
+        const newAppointment = {
+            barber: selectedBarber,
+            service: selectedService,
+            appointmentDate,
+            appointmentTime,
+            status,
+            appointmentType,
+            feedback,
+            rating,
+        }
         try {
             //  await axios.post(`/api/admin/appointment`, {
             //     barber: selectedBarber,
@@ -129,17 +140,17 @@ const NewAppointment = () => {
             //     feedback,
             //     rating,
             // });
-            const response = await axios.post(`/api/admin/appointment`, {
-                barber: selectedBarber,
-                service: selectedService,
-                appointmentDate,
-                appointmentTime,
-                status,
-                appointmentType,
-                feedback,
-                rating,
-            });
 
+            const response = await fetch(`/api/admin/appointment`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newAppointment),
+            });
+        
+            if (!response.ok) {
+                setError("Failed to Create appointments");
+                throw new Error("Failed to Create appointments");
+            }
             console.log("Appointment created successfully", response);
             router.push("/dashboard/appointments");
         } catch (err) {

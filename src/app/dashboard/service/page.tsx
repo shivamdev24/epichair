@@ -23,13 +23,13 @@ interface ModalProps {
     newService: {
         name: string;
         description?: string;
-        price?: number;
+        price: number;
         duration?: number;
     };
     setNewService: React.Dispatch<React.SetStateAction<{
         name: string;
         description?: string;
-        price?: number;
+        price: number;
         duration?: number;
     }>>;
 }
@@ -119,7 +119,7 @@ const ServiceManagement = () => {
     const [newService, setNewService] = useState<{
         name: string;
         description?: string; // Optional
-        price?: number;       // Optional
+        price: number;       // Optional
         duration?: number;    // Optional
     }>({
         name: '',
@@ -136,7 +136,7 @@ const ServiceManagement = () => {
                 const response = await fetch('/api/admin/service');
                 const data = await response.json();
                 // console.log('API response:', data); // Log the entire response
-
+console.log(data)
                 // Check if data is an array directly
                 if (Array.isArray(data)) {
                     setServices(data);
@@ -181,9 +181,10 @@ const ServiceManagement = () => {
                 },
                 body: JSON.stringify(newService),
             });
-
+            
             if (response.ok) {
                 const createdService = await response.json();
+                console.log("created service", createdService)
                 setServices([...services, createdService]); // Add new service to state
                 // Indicate success
                 setNewService({ name: '', description: '', price: 0, duration: 0 }); // Reset form

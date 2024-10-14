@@ -111,9 +111,17 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     const userId = verifyToken(request);
-    console.log(userId);
 
+    console.log(userId);
     if (!userId) {
+      return NextResponse.json(
+        { message: "Authorization required to create an appointment." },
+        { status: 401 }
+      );
+    }
+    const Id = userId.id;
+
+    if (!Id) {
       return NextResponse.json(
         { message: "Authorization required to create an appointment." },
         { status: 401 }
@@ -122,16 +130,16 @@ export async function POST(request: NextRequest) {
 
     const newAppointment = new Appointment({
       barber,
-      user: userId,
+      user: Id,
       service,
       appointmentDate,
       appointmentTime,
       appointmentType: "WalkIn", // Default value
-      status: status || "confirmed" , 
+      status: status || "confirmed",
       feedback,
       rating,
     });
-
+console.log(newAppointment)
     await newAppointment.save();
     return NextResponse.json(newAppointment, { status: 201 });
   } catch (error) {

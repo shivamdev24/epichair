@@ -18,7 +18,6 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import HashLoader from "react-spinners/HashLoader";
 import Link from "next/link";
-import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 
 interface Appointment {
@@ -64,8 +63,8 @@ const AppointmentUpdate = () => {
             
             setLoading(true);
             try {
-                const appointmentResponse = await axios.get(`/api/admin/appointment/appointment-id?id=${id}`);
-                const appointmentData = appointmentResponse.data;
+                const appointmentResponse = await fetch(`/api/admin/appointment/appointment-id?id=${id}`);
+                const appointmentData = await appointmentResponse.json();
 
                 setAppointment(appointmentData);
                 setSelectedService(appointmentData.service);
@@ -85,8 +84,9 @@ const AppointmentUpdate = () => {
 
         const fetchServices = async () => {
             try {
-                const response = await axios.get("/api/admin/service");
-                setServices(response.data); // Assuming your API returns an array of services
+                const response = await fetch("/api/admin/service");
+                const Service = await response.json();
+                setServices(Service); // Assuming your API returns an array of services
             } catch (err) {
                 console.error(err);
                 setError("An error occurred while fetching services");
@@ -101,27 +101,28 @@ const AppointmentUpdate = () => {
         
         event.preventDefault();
         try {
-           await axios.put(`/api/admin/appointment?id=${id}`, {
-                service: selectedService, // Use selectedService here
-                appointmentDate,
-                appointmentTime,
-                status,
-                appointmentType,
-                feedback,
-                rating,
+            const response = await fetch(`/api/admin/appointment?id=${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    service: selectedService, // Use selectedService here
+                    appointmentDate,
+                    appointmentTime,
+                    status,
+                    appointmentType,
+                    feedback,
+                    rating,
+                }),
             });
-            // const response = await axios.put(`/api/admin/appointment?id=${id}`, {
-            //     service: selectedService, // Use selectedService here
-            //     appointmentDate,
-            //     appointmentTime,
-            //     status,
-            //     appointmentType,
-            //     feedback,
-            //     rating,
-            // });
+           
+            if (!response.ok) {
+                throw new Error("Failed to update appointment");
+            }
 
 router.push("/dashboard/appointments");
-            // console.log("Appointment updated successfully", response);
+            console.log("Appointment updated successfully", response);
         } catch (err) {
             console.error("Error updating appointment:", err);
             setError("An error occurred while updating the appointment");

@@ -211,7 +211,7 @@ export async function PUT(request: NextRequest) {
    const userId = url.searchParams.get("id");
 
   const body = await request.json();
-  const {  name,  services } = body;
+  const {  username,  services } = body;
 
   // Validate required fields
   
@@ -238,10 +238,12 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update the user's details
-    existingUser.username = name;
+    existingUser.username = username;
     existingUser.services = services;
 
     await existingUser.save();
+
+    console.log(existingUser);
 
     return NextResponse.json(
       { message: "User updated successfully!" },

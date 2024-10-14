@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     const services = await Service.find(); // Fetch all services
+    console.log(services)
     return NextResponse.json(services, { status: 200 });
   } catch (error) {
     console.error("Error fetching services:", error);
@@ -83,10 +84,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const { name, description, duration } = await request.json();
+    const { name, description, duration, price } = await request.json();
 
     // Create a new service
-    const newService = new Service({ name, description, duration });
+    const newService = new Service({ name, description, duration, price });
     await newService.save();
 
     return NextResponse.json(newService, { status: 201 });

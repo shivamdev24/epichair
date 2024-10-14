@@ -79,8 +79,8 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
         // Ensure optional fields are not undefined
         const updatedUser = {
             id,
-            username: username || "",  // Default to empty string if username is undefined
-            email: email || "",  // Default to empty string if email is undefined
+            username: username ,  // Default to empty string if username is undefined
+            email: email ,  // Default to empty string if email is undefined
             role: role || "user",  // Default to 'user' if role is undefined
             feedback: feedback ?? "",  // Set feedback to empty string if undefined
             rating: rating !== undefined ? parseFloat(rating as string) : null,  // Parse rating or set to null if undefined
