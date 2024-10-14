@@ -1,48 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import { verifyToken } from "@/utils/Token";
 import Service from "@/models/Service";
 
 // Connect to the database
 db();
 
-const verifyToken = (request: NextRequest) => {
-  const authHeader = request.headers.get("Authorization");
-  let token: string | null = null;
 
-  // Check Authorization header first
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
-  } else {
-    token = request.cookies.get("token")?.value || null;
-  }
-
-  // Check if token is available
-  if (!token) {
-    throw new Error("Authorization token is required.");
-  }
-
-  try {
-    const decoded = jwt.verify(
-      token,
-      process.env.TOKEN_SECRET || "default_secret_key"
-    );
-
-    if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-      return decoded; // Return the full decoded object
-    } else {
-      throw new Error("Invalid token payload.");
-    }
-  } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error("Invalid token.", { cause: error });
-    } else if (error instanceof jwt.TokenExpiredError) {
-      throw new Error("Token has expired.", { cause: error });
-    } else {
-      throw new Error("Token verification failed.", { cause: error });
-    }
-  }
-};
 
 // GET: Fetch all services
 export async function GET(request: NextRequest) {
