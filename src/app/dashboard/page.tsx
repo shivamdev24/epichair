@@ -113,10 +113,10 @@ const Dashboard = () => {
     const callservice = async () => {
       const response = await fetch('/api/admin/service');
        await response.json();
-      // const data = await response.json();
+      const data = await response.json();
 
       // Log the entire data object
-      // console.log('Fetched Service Data:', data);
+      console.log('Fetched Service Data:', data);
       
     };
 
