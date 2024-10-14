@@ -10,8 +10,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const CreateStaffForm: React.FC = () => {
+
+    const router = useRouter();
+
+
     const [username, setUsername] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [feedback, setFeedback] = useState<string>("");
@@ -69,7 +74,7 @@ const CreateStaffForm: React.FC = () => {
                 throw new Error(responseData.message || "Failed to create staff");
             }
 
-            alert("Staff created successfully!");
+            router.push('/dashboard/staff')
         } catch (error) {
             console.error("Error creating staff:", error);
             setErrorMessage("Could not create staff. Please try again later.");

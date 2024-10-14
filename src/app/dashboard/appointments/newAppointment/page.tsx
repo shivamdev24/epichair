@@ -119,17 +119,7 @@ const NewAppointment = () => {
         event.preventDefault();
         setLoading(true);
         try {
-             await axios.post(`/api/admin/appointment`, {
-                barber: selectedBarber,
-                service: selectedService,
-                appointmentDate,
-                appointmentTime,
-                status,
-                appointmentType,
-                feedback,
-                rating,
-            });
-            // const response = await axios.post(`/api/admin/appointment`, {
+            //  await axios.post(`/api/admin/appointment`, {
             //     barber: selectedBarber,
             //     service: selectedService,
             //     appointmentDate,
@@ -139,8 +129,18 @@ const NewAppointment = () => {
             //     feedback,
             //     rating,
             // });
+            const response = await axios.post(`/api/admin/appointment`, {
+                barber: selectedBarber,
+                service: selectedService,
+                appointmentDate,
+                appointmentTime,
+                status,
+                appointmentType,
+                feedback,
+                rating,
+            });
 
-            // console.log("Appointment created successfully", response);
+            console.log("Appointment created successfully", response);
             router.push("/dashboard/appointments");
         } catch (err) {
             console.error("Error creating appointment:", err);
