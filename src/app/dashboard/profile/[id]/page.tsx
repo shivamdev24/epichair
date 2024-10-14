@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/card";
 import { toast } from "react-toastify";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const UserProfile = ({ params }: any) => {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
  
@@ -44,6 +46,7 @@ const UserProfile = ({ params }: any) => {
           closeOnClick: true,
           pauseOnHover: true,
         });
+        router.push("/dashboard/profile");
       } else {
         
          toast.error("Update Failed", {
