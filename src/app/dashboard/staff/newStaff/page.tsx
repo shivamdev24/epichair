@@ -70,9 +70,7 @@ const CreateStaffForm: React.FC = () => {
             const responseData = await response.json();
             console.log("API Response Data:", responseData);
 
-            if (!response.ok) {
-                throw new Error(responseData.message || "Failed to create staff");
-            }
+            
 
             router.push('/dashboard/staff')
         } catch (error) {
