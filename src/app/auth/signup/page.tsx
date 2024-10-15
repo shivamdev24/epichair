@@ -51,8 +51,16 @@ export default function SignInPage() {
         },
         body: JSON.stringify(user), // Send user data in the request body
       });
-      console.log("Sent verification Otp Successfully.", response);
-      router.push(`/auth/signup/verifyotp?email=${encodeURIComponent(user.email)}`);
+
+      if (response.ok) {
+        console.log("Sent verification Otp Successfully.", response);
+        router.push(`/auth/signup/verifyotp?email=${encodeURIComponent(user.email)}`);
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message ); // Display error message
+      }
+
+     
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Signup failed:", error); // Log the error for debugging
