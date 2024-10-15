@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Axios from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,12 +14,14 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  console.log({email,password})
+
   const [buttonDisabled, setButtonDisabled] = useState({
     login: true,
     otp: true,
   });
   const [loading, setLoading] = useState(false);
-  // const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -38,27 +39,59 @@ export default function SignInPage() {
     e.preventDefault(); // Prevent the default form submission
 
     setLoading(true);
-    // setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage(""); // Clear any previous error messages
 
     try {
-      const response = await Axios.post("/api/admin/auth/loginwithPassword", { email, password });
-      console.log("Sent verification Otp Successfully.", response.data);
-      router.push(`/dashboard`);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+      const response = await fetch("/api/admin/auth/loginwithPassword", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }), // Send email and password in the body
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Sent verification Otp successfully.", data);
+        router.push(`/dashboard`); // Redirect to the dashboard on success
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "An error occurred during login.");
+      }
+    } catch (error) {
       console.error("Login failed:", error); // Log the error for debugging
-      // setErrorMessage(
-      //   error.response?.data?.message || "An error occurred during login." // Display error message
-      // );
-    } 
+      setErrorMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Reset loading state
+    }
   };
+
 
   const onOtpLogin = async () => {
     // Redirect to the OTP verification route
-    const response = await Axios.post("/api/auth/login", { email });
-    console.log("Sent verification Otp Successfully.", response.data);
-    router.push(`/auth/login/verifyotp?email=${encodeURIComponent(email)}`);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }), // Send user data in the request body
+      });
+
+      if (response.ok) {
+        // Successful response, redirect to OTP verification
+        router.push(`/auth/login/verifyotp?email=${encodeURIComponent(email)}`);
+      } else {
+        // If the response is not ok, handle error
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "An error occurred during login.");
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
+    }
   };
+
 
   return (
     <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
@@ -74,7 +107,7 @@ export default function SignInPage() {
             />
           </p>
         ) : ""}
-        {/* {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>} */}
+        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         <Card className="w-full p-8 flex mx-auto flex-col justify-center items-center ">
           <CardHeader>
             <CardTitle>Login Into Account</CardTitle>
@@ -132,3 +165,4 @@ export default function SignInPage() {
     </div>
   );
 }
+

@@ -54,7 +54,7 @@ export default function SignInPage() {
 
       if (response.ok) {
         console.log("Sent verification Otp Successfully.", response);
-        router.push(`/auth/signup/verifyotp?email=${encodeURIComponent(user.email)}`);
+        router.push(`/auth/signup/verifyotp?email=${user.email}`);
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message ); // Display error message

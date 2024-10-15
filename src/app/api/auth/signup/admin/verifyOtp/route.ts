@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   console.log("Email from URL:", email);
 
   const body = await request.json();
-  const { otp } = body;
+  const {  otp } = body;
 
   try {
     const user = await User.findOne({ email });

@@ -31,6 +31,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const existingUser = await User.findOne({ email });
+    if(!existingUser){
+      return NextResponse.json(
+        {
+          message:
+            "User Not Found.",
+        },
+        { status: 404 } // Change status to 200 for successful operation
+      );
+    }
      if (existingUser) {
        if (existingUser.isVerified) {
          // Generate and send OTP for non-verified user
