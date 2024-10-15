@@ -36,7 +36,7 @@ const NewAppointment = () => {
     const [appointmentDate, setAppointmentDate] = useState("");
     const [appointmentTime, setAppointmentTime] = useState("");
     const [status, setStatus] = useState<"pending" | "confirmed" | "completed" | "cancelled">("pending");
-    const [appointmentType, setAppointmentType] = useState<"inApp" | "WalkIn">("inApp");
+    // const [appointmentType, setAppointmentType] = useState<"inApp" | "WalkIn">("inApp");
     const [feedback, setFeedback] = useState("");
     const [rating, setRating] = useState<number | null>(null);
 
@@ -125,7 +125,7 @@ const NewAppointment = () => {
             appointmentDate,
             appointmentTime,
             status,
-            appointmentType,
+            // appointmentType,
             feedback,
             rating,
         }
@@ -195,7 +195,7 @@ const NewAppointment = () => {
                         <div className="flex flex-col space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Service
+                                    Service <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={selectedService}
@@ -213,7 +213,7 @@ const NewAppointment = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Barber
+                                    Barber <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={selectedBarber}
@@ -235,7 +235,7 @@ const NewAppointment = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Appointment Date
+                                    Appointment Date <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="date"
@@ -247,7 +247,7 @@ const NewAppointment = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Appointment Time
+                                    Appointment Time <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="time"
@@ -259,7 +259,7 @@ const NewAppointment = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Status
+                                    Status <span className="text-red-500">*</span>
                                 </label>
                                 <select
                                     value={status}
@@ -276,16 +276,13 @@ const NewAppointment = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">
-                                    Appointment Type
-                                </label>
+                                    Appointment Type <span className="text-red-500">*</span>
+                                </label> 
                                 <select
-                                    value={appointmentType}
-                                    onChange={(event) =>
-                                        setAppointmentType(event.target.value as "inApp" | "WalkIn")
-                                    }
+                                    
+                                    disabled
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
-                                    <option value="inApp">In-App</option>
                                     <option value="WalkIn">Walk-In</option>
                                 </select>
                             </div>

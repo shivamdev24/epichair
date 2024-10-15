@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,9 @@ import axios from "axios";
 
 export default function VerifyOtpPage() {
     const router = useRouter();
-    const {email} = useParams(); // Get the email from the query parameters
+    const searchParams = useSearchParams();
+    const email = searchParams.get('email');
+    console.log(email)
 
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
@@ -50,19 +52,20 @@ export default function VerifyOtpPage() {
     };
 
     return (
+        <Suspense fallback={<HashLoader />}>
         <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
             <div>
                 <h1>
                     {loading ? (
-                        <p className="flex mx-auto h-screen justify-center items-center text-6xl">
-                            <HashLoader
-                                color="#000"
-                                loading={loading}
-                                size={80}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                        </p>
+                            <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center text-6xl z-50">
+                                <HashLoader
+                                    color="#000"
+                                    loading={loading}
+                                    size={80}
+                                    aria-label="Loading Spinner"
+                                    data-testid="loader"
+                                />
+                            </p>
                     ) : (
                         ""
                     )}
@@ -115,5 +118,6 @@ export default function VerifyOtpPage() {
                 </Card>
             </div>
         </div>
+        </Suspense>
     );
 }

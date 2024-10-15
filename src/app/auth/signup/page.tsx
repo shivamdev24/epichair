@@ -6,15 +6,18 @@
 
 import {  useState } from "react";
 import { useRouter } from "next/navigation";
-import Axios from "axios";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import HashLoader from "react-spinners/HashLoader";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignInPage() {
+
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -23,18 +26,32 @@ export default function SignInPage() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
-
  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword); // Toggle the state
+  };
 
   const onSignIn = async (e: React.FormEvent) => {
     e.preventDefault(); // Prevent the default form submission
 
     setLoading(true);
     setErrorMessage(""); // Clear any previous error messages
+    if (!user.email || !user.password) {
+      setErrorMessage("Both email and password fields are required.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const response = await Axios.post("/api/auth/signup/admin", user);
-      console.log("Sent verification Otp Successfully.", response.data);
+      const response = await fetch("/api/auth/signup/admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user), // Send user data in the request body
+      });
+      console.log("Sent verification Otp Successfully.", response);
       router.push(`/auth/signup/verifyotp?email=${encodeURIComponent(user.email)}`);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -78,21 +95,32 @@ export default function SignInPage() {
               />
             </CardContent>
             <CardContent>
-              <Input
-                placeholder="Password"
-                autoComplete="current-password"
-                type="password"
-                value={user.password}
-                onChange={(e) => setUser({ ...user, password: e.target.value })}
-              />
+              <div className="flex justify-between"> {/* Wrapper to position the toggle icon */}
+                <Input
+                  placeholder="Password"
+                  autoComplete="current-password"
+                  type={showPassword ? "text" : "password"} // Conditional input type
+                  value={user.password}
+                  onChange={(e) => setUser({ ...user, password: e.target.value })}
+                />
+
+                {/* Toggle button or icon */}
+                <button
+                  type="button"
+                  className="absolute right-2 top-2" // Position the button inside the input
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />} {/* Change icon based on state */}
+                </button>
+              </div>
             </CardContent>
             <CardContent>
               <Button
                 className="w-full"
                 type="submit"
+               
                 
-              >
-                Signup
+              >Signup
               </Button>
             </CardContent>
            

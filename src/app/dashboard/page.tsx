@@ -392,19 +392,16 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 interface Appointment {
-  appointmentTime: string;
-  status: string;
   _id: string;
-  service: { name: string };
-  appointmentDate: string | number | Date;
-  barber: {
-    username: string;
-    email: string;
-  };
-  user: {
-    username: string;
-    email: string;
-  };
+  barber: { username: string, email: string } | null;
+  user: { email: string, username: string };
+  service: { _id: string; name: string } | null;
+  appointmentDate: string;
+  appointmentTime?: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  appointmentType: "inApp" | "WalkIn";
+  feedback?: string;
+  rating?: number;
 }
 
 const Dashboard = () => {
@@ -450,12 +447,11 @@ const Dashboard = () => {
 
 
 
-
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(':');
     let hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 || 12; // Convert to 12-hour format
+    hour = hour % 12 || 12; // Convert to 12-hour format, handle '0' as '12'
     return `${hour}:${minutes} ${ampm}`;
   };
 
@@ -498,7 +494,7 @@ const Dashboard = () => {
                   {new Date(appointment.appointmentDate).toLocaleDateString()}
                 </td>
                 <td className="border border-gray-300 px-4 py-4 text-center">
-                  {formatTime(appointment.appointmentTime)}
+                  {appointment.appointmentTime ? formatTime(appointment.appointmentTime as string) : 'N/A'}
                 </td>
                 <td className={`border border-gray-300 px-4 py-4 text-white text-center ${appointment.status === "pending" ? "bg-yellow-600" :
                   appointment.status === "confirmed" ? "bg-green-500" :
@@ -532,47 +528,73 @@ const Dashboard = () => {
         <table className="min-w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th className="border border-gray-300 px-4 py-2">Barber</th>
-              <th className="border border-gray-300 px-4 py-2">User</th>
-              <th className="border border-gray-300 px-4 py-2">Service</th>
-              <th className="border border-gray-300 px-4 py-2">Appointment Date</th>
-              <th className="border border-gray-300 px-4 py-2">Appointment Time</th>
-              <th className="border border-gray-300 px-4 py-2">Status</th>
-              <th className="px-6 py-3 border border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
+              <th className="px-4 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">User</th>
+              <th className="px-4 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">User Email</th>
+              <th className="px-4 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Barber</th>
+              <th className="px-4 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Barber Email</th>
+              <th className="px-4 py-3 border-2 border-gray-300 text-center text-sm leading-4 text-gray-600 tracking-wider">Service</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Appointment Date</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Appointment Time</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Status</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Type</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Feedback</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Rating</th>
+              <th className="px-4 py-3 border-2 border-gray-300  text-center text-sm leading-4 text-gray-600 tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody >
             {currentAppointments.map((appointment) => (
-              <tr key={appointment._id}>
-                <td className="border border-gray-300 px-4 py-4 text-center">
-                  {appointment.barber?.username || 'Unknown Barber'}
+              <tr key={appointment._id} >
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                  {appointment.user?.username || "No User"}
                 </td>
-                <td className="border border-gray-300 px-4 py-4 text-center">
-                  {appointment.user?.username || 'Unknown User'}
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                  {appointment.user?.email || "No User"}
                 </td>
-                <td className="border border-gray-300 px-4 py-4 text-center">
-                  {appointment.service?.name || 'No Service'}
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                  {appointment.barber?.username || "Unknown Barber"}
                 </td>
-                <td className="border border-gray-300 px-4 py-4 text-center">
-                  {new Date(appointment.appointmentDate).toLocaleDateString()}
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                  {appointment.barber?.email || "Unknown Barber"}
                 </td>
-                <td className="border border-gray-300 px-4 py-4 text-center">
-                  {formatTime(appointment.appointmentTime)}
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">{appointment.service?.name || "No Services"}</td>
+                {/* <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">
+                      {typeof appointment.service === "object" ? appointment.service?.name : appointment.service || "No Services"}
+                    </td> */}
+
+                <td className="px-4 text-center  py-4 whitespace-no-wrap border border-gray-300">
+                  {new Date(appointment.appointmentDate).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
                 </td>
-                <td className={`border border-gray-300 px-4 py-4 text-white text-center ${appointment.status === "pending" ? "bg-yellow-600" :
+                {/* <td className="px-6 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.appointmentTime || "Not Set"}</td> */}
+                <td className="border border-gray-300 px-4 py-4 text-center">
+                  {appointment.appointmentTime ? formatTime(appointment.appointmentTime as string) : 'N/A'}
+                </td>
+                <td className={`border border-gray-300 px-4 py-4 text-white font-bold text-center ${appointment.status === "pending" ? "bg-yellow-600" :
                   appointment.status === "confirmed" ? "bg-green-500" :
                     appointment.status === "completed" ? "bg-blue-500" :
                       appointment.status === "cancelled" ? "bg-red-500" :
-                        "text-gray-500"
+                        "text-gray-500" // Fallback color for undefined status
                   }`}>
                   {appointment.status}
                 </td>
-                <td className="px-7 py-4 border gap-3 border-gray-300 text-center">
-                  <Link href={`/dashboard/appointments/${appointment._id}`}>
-                    <Button className="bg-yellow-500 text-white rounded">
-                      Edit
-                    </Button>
+                <td className="px-4 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.appointmentType}</td>
+                <td className="px-4 text-center py-4 whitespace-no-wrap border border-gray-300">{appointment.feedback || "No Feedback"}</td>
+                <td className="px-4 text-center py-4 whitespace-no-wrap border border-gray-300">
+                  {appointment.rating != null && !isNaN(appointment.rating) ? appointment.rating : "Not Rated"}
+                </td>
+
+                <td className=" px-4 py-5 border-b border-r  gap-3 border-gray-300 text-gray-600 flex items-center justify-center  ">
+                  <Link
+                    href={`/dashboard/appointments/${appointment._id}`}
+
+                  >
+                    <Button className=" bg-yellow-500 text-white rounded">Edit</Button>
                   </Link>
+                 
                 </td>
               </tr>
             ))}

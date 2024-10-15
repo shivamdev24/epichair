@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
     
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [usersPerPage] = useState(5);
+    const [usersPerPage] = useState(10);
 
     useEffect(() => {
         fetchUsers();
@@ -107,10 +107,10 @@ const Dashboard: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-300">
                     <thead className="bg-gray-200">
                         <tr>
-                            <th className="border border-gray-300 px-4 py-2">Username</th>
-                            <th className="border border-gray-300 px-4 py-2">Username</th>
-                            <th className="border border-gray-300 px-4 py-2">Email</th>
-                            <th className="border border-gray-300 px-4 py-2">service</th>
+                            <th className="border border-gray-300 px-4 py-2">Staff Profile</th>
+                            <th className="border border-gray-300 px-4 py-2">Staff Name</th>
+                            <th className="border border-gray-300 px-4 py-2">Staff Email</th>
+                            <th className="border border-gray-300 px-4 py-2">Service</th>
                             <th className="border border-gray-300 px-4 py-2">Role</th>
                             <th className="border border-gray-300 px-4 py-2">Verified</th>
                             <th className="border border-gray-300 px-4 py-2">Actions</th>

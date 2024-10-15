@@ -31,37 +31,64 @@ export async function POST(request: NextRequest) {
 
   try {
     const existingUser = await User.findOne({ email });
+     if (existingUser) {
+       if (existingUser.isVerified) {
+         // Generate and send OTP for non-verified user
+         const otp = generateOtp();
+         const otpExpiry = getOtpExpiry(10);
+         const hashedOtp = await bcrypt.hash(otp, 10);
 
-    if (existingUser) {
-      
-      
+         // Update user with new OTP and expiry
+         await User.findByIdAndUpdate(existingUser._id, {
+           otp: hashedOtp, // Ensure this matches your user schema
+           otpExpiry,
+         });
 
-      // Generate and send OTP for non-verified user
-      const otp = generateOtp();
-      const otpExpiry = getOtpExpiry(10);
-      const hashedOtp = await bcrypt.hash(otp, 10);
+         await sendEmail({
+           email,
+           emailType: "LOGIN OTP",
+           userId: existingUser._id.toString(),
+           otp,
+         });
 
-      // Update user with new OTP and expiry
-      await User.findByIdAndUpdate(existingUser._id, {
-        otp: hashedOtp, // Ensure this matches your user schema
-        otpExpiry,
-      });
+         return NextResponse.json(
+           {
+             message:
+               "User already exists and is verified. A otp email has been sent.",
+           },
+           { status: 200 } // Change status to 200 for successful operation
+         );
+       } else {
+         // Generate new OTP and update the user
+         const otp = generateOtp();
+         const hashedOtp = await bcrypt.hash(otp, 10);
+         const otpExpiry = getOtpExpiry(10);
 
-      await sendEmail({
-        email,
-        emailType: "LOGIN OTP",
-        userId: existingUser._id.toString(),
-        otp,
-      });
+         await User.findByIdAndUpdate(existingUser._id, {
+           otp: hashedOtp,
+           otpExpiry,
+         });
 
-      return NextResponse.json(
-        {
-          message:
-            "User already exists and is verified. A otp email has been sent.",
-        },
-        { status: 200 } // Change status to 200 for successful operation
-      );
-    }
+         // Send OTP email
+         await sendEmail({
+           email,
+           emailType: "LOGIN OTP",
+           userId: existingUser._id.toString(),
+           otp,
+         });
+
+         return NextResponse.json(
+           {
+             message:
+               "User exists but is not verified. A new verification email has been sent.",
+           },
+           { status: 200 }
+         );
+       }
+     }
+
+
+   
 
     // If the user doesn't exist, handle new user case
     const otp = generateOtp();
