@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     const existingAdminCount = await User.countDocuments({role : "admin"});
-    if (existingAdminCount >= 2) {
+    if (existingAdminCount >= 3) {
       return NextResponse.json(
         {
           message:
