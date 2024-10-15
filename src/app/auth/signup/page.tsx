@@ -103,7 +103,7 @@ export default function SignInPage() {
               />
             </CardContent>
             <CardContent>
-              <div className="flex justify-between"> {/* Wrapper to position the toggle icon */}
+              <div className="flex justify-between relative"> {/* Wrapper to position the toggle icon */}
                 <Input
                   placeholder="Password"
                   autoComplete="current-password"
@@ -118,7 +118,7 @@ export default function SignInPage() {
                   className="absolute right-2 top-2" // Position the button inside the input
                   onClick={togglePasswordVisibility}
                 >
-                  {showPassword ? <EyeOff /> : <Eye />} {/* Change icon based on state */}
+                  {showPassword ? <Eye /> : <EyeOff />} {/* Change icon based on state */}
                 </button>
               </div>
             </CardContent>
