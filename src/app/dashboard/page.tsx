@@ -90,42 +90,42 @@
 //         console.error('Error fetching users:', error);
 //       }
 //     };
-//     const fetchStaff = async () => {
-//       try {
-//         const response = await fetch('/api/admin/staff');
-//         const data = await response.json();
+  //   const fetchStaff = async () => {
+  //     try {
+  //       const response = await fetch('/api/admin/staff');
+  //       const data = await response.json();
 
-//         // Log the entire data object
-//         // console.log('Fetched Staff Data:', data);
+  //       // Log the entire data object
+  //       // console.log('Fetched Staff Data:', data);
 
-//         // Correctly access the staff property
-//         if (data.staff && Array.isArray(data.staff)) {
-//           setStaff(data.staff.length); // Or rename this to something like setStaffCount
-//         } else {
-//           // console.warn('Expected staff to be an array but got:', data.staff);
-//           setStaff(0); // Handle as needed
-//         }
+  //       // Correctly access the staff property
+  //       if (data.staff && Array.isArray(data.staff)) {
+  //         setStaff(data.staff.length); // Or rename this to something like setStaffCount
+  //       } else {
+  //         // console.warn('Expected staff to be an array but got:', data.staff);
+  //         setStaff(0); // Handle as needed
+  //       }
 
-//       } catch (error) {
-//         console.error('Error fetching staff:', error);
-//       }
-//     };
-//     const callservice = async () => {
-//       const response = await fetch('/api/admin/service');
-//       //  await response.json();
-//       const data = await response.json();
+  //     } catch (error) {
+  //       console.error('Error fetching staff:', error);
+  //     }
+  //   };
+  //   const callservice = async () => {
+  //     const response = await fetch('/api/admin/service');
+  //     //  await response.json();
+  //     const data = await response.json();
 
-//       // Log the entire data object
-//       console.log('Fetched Service Data:', data);
+  //     // Log the entire data object
+  //     console.log('Fetched Service Data:', data);
       
-//     };
+  //   };
 
 
-//     fetchAppointments();
-//     fetchUser();
-//     fetchStaff();
-//     callservice();
-//   }, []);
+  //   fetchAppointments();
+  //   fetchUser();
+  //   fetchStaff();
+  //   callservice();
+  // }, []);
 
 //   const deleteAppointment = async (appointmentId: string) => {
 //     try {
@@ -387,9 +387,15 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Card } from "@/components/ui/card";
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+ 
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 interface Appointment {
   _id: string;
@@ -407,7 +413,8 @@ interface Appointment {
 const Dashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
-
+  const [user, setUser] = useState(0);
+    const [staff, setStaff] = useState(0);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const appointmentsPerPage = 10; // Number of appointments per page
@@ -437,9 +444,48 @@ const Dashboard = () => {
         console.error('Error fetching appointments:', error);
       }
     };
+    const fetchStaff = async () => {
+      try {
+        const response = await fetch('/api/admin/staff');
+        const data = await response.json();
 
+        // Log the entire data object
+        // console.log('Fetched Staff Data:', data);
+
+        // Correctly access the staff property
+        if (data.staff && Array.isArray(data.staff)) {
+          setStaff(data.staff.length); // Or rename this to something like setStaffCount
+        } else {
+          // console.warn('Expected staff to be an array but got:', data.staff);
+          setStaff(0); // Handle as needed
+        }
+       
+
+      } catch (error) {
+        console.error('Error fetching staff:', error);
+      }
+    };
+    const fetchUser = async () => {
+      const response = await fetch('/api/admin/user');
+      //  await response.json();
+      const data = await response.json();
+      console.log('Fetched user Data:', data);
+      if (data.User && Array.isArray(data.User)) {
+        setUser(data.User.length); // Or rename this to something like setStaffCount
+      } else {
+        // console.warn('Expected staff to be an array but got:', data.staff);
+        setUser(0); // Handle as needed
+      }
+      // Log the entire data object
+
+    };
+
+
+    fetchUser();
+    fetchStaff();
     fetchAppointments();
   }, []);
+ 
 
 
 
@@ -463,6 +509,51 @@ const Dashboard = () => {
 
   return (
     <div className='px-5 py-10'>
+
+
+
+
+ <section className='py-10 flex flex-col md:flex-row items-center gap-4 justify-evenly'>
+         <Card className='w-full text-center md:w-72'>
+           <CardHeader>
+             <CardTitle>Today&apos;s Appointment</CardTitle>          
+           </CardHeader>
+           <CardContent className='text-xl font-bold text-blue-500'>
+             {todayAppointments.length}
+           </CardContent>        
+         </Card>      
+         <Card className='w-full text-center md:w-72'>
+           <CardHeader>
+             <CardTitle>Total Appointment</CardTitle>          
+           </CardHeader>
+           <CardContent className='text-xl font-bold text-blue-500'>
+             {appointments.length}
+           </CardContent>        
+         </Card>
+         <Card className='w-full text-center md:w-72'>
+           <CardHeader>
+             <CardTitle>Total Users</CardTitle>          
+           </CardHeader>
+           <CardContent className='text-xl font-bold text-blue-500'>
+             {user}
+           </CardContent>        
+         </Card>
+         <Card className='w-full text-center md:w-72'>
+           <CardHeader>
+             <CardTitle>Total Staff</CardTitle>          
+           </CardHeader>
+           <CardContent className='text-xl font-bold text-blue-500'>
+             {staff}
+           </CardContent>        
+         </Card>
+
+
+ </section>
+
+
+
+
+
       {/* Today's Appointments - No Pagination */}
       <Card className='overflow-hidden overflow-x-auto '>
         <h2 className='text-lg p-3 font-bold text-blue-800'>Today&apos;s Appointments</h2>
