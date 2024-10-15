@@ -119,6 +119,9 @@ import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import db from "@/utils/db";
+
+db();
 
 export async function POST(request: NextRequest) {
   const { email, otp } = await request.json();
