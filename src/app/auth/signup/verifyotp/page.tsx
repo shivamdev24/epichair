@@ -123,7 +123,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // Import useSearchParams
+import { useRouter, useParams } from "next/navigation"; // Import useSearchParams
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -132,8 +132,8 @@ import axios from "axios";
 
 export default function VerifyOtpPage() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const email = searchParams.get('email');
+    const searchParams = useParams();
+    const email = searchParams.email;
 console.log(email)
     const [otp, setOtp] = useState("");
     const [loading, setLoading] = useState(false);
