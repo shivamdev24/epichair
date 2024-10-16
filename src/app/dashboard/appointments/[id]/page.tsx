@@ -35,7 +35,7 @@ interface Appointment {
 
 interface Service {
     _id: string;
-    name: string; // Update according to your service structure
+    name: string;
 }
 
 const AppointmentUpdate = () => {
@@ -46,7 +46,7 @@ const AppointmentUpdate = () => {
     const [appointment, setAppointment] = useState<Appointment | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState("");
-    const [services, setServices] = useState<Service[]>([]); // State for services
+    const [services, setServices] = useState<Service[]>([]); 
     const [selectedService, setSelectedService] = useState<string>("");
     const [appointmentDate, setAppointmentDate] = useState("");
     const [appointmentTime, setAppointmentTime] = useState("");
@@ -55,21 +55,38 @@ const AppointmentUpdate = () => {
     const [feedback, setFeedback] = useState("");
     const [rating, setRating] = useState<number | null>(null);
 
-    // Fetch appointment and services
+    // const handleTimeChange = (event: { target: { value: any; }; }) => {
+    //     const { value } = event.target;
+
+    //     // Validate if the selected time is in 15-minute intervals
+    //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //     const [hours, minutes] = value.split(':').map(Number);
+    //     if (minutes % 15 === 0) {
+    //         setAppointmentTime(value);
+    //     } else {
+    //         alert('Please select a time in 15-minute intervals.');
+    //         // Optionally, reset to the last valid time or keep the current one
+    //         // setAppointmentTime(appointmentTime); // Uncomment to reset to last valid
+    //     }
+    // };
+
     useEffect(() => {
 
         console.log(id);
         const fetchAppointment = async () => {
-            
             setLoading(true);
             try {
                 const appointmentResponse = await fetch(`/api/admin/appointment/appointment-id?id=${id}`);
                 const appointmentData = await appointmentResponse.json();
+                console.log("Fetched Appointment Data:", appointmentData);
+
+                // Format the date to YYYY-MM-DD
+                const formattedDate = new Date(appointmentData.appointmentDate).toISOString().split('T')[0];
 
                 setAppointment(appointmentData);
                 setSelectedService(appointmentData.service);
-                setAppointmentDate(appointmentData.appointmentDate);
-                setAppointmentTime(appointmentData.appointmentTime || "");
+                setAppointmentDate(formattedDate);
+                setAppointmentTime(appointmentData.appointmentTime);
                 setStatus(appointmentData.status);
                 setAppointmentType(appointmentData.appointmentType);
                 setFeedback(appointmentData.feedback || "");
@@ -82,11 +99,12 @@ const AppointmentUpdate = () => {
             }
         };
 
+
         const fetchServices = async () => {
             try {
                 const response = await fetch("/api/admin/service");
                 const Service = await response.json();
-                setServices(Service); // Assuming your API returns an array of services
+                setServices(Service); 
             } catch (err) {
                 console.error(err);
                 setError("An error occurred while fetching services");
@@ -96,10 +114,18 @@ const AppointmentUpdate = () => {
         fetchAppointment();
         fetchServices();
     }, [id]);
+    console.log("app time",appointmentTime);
+
+    
 
     const updateAppointment = async (event: React.FormEvent) => {
-        
         event.preventDefault();
+
+        if (!selectedService || !appointmentDate || !appointmentTime || !status) {
+            console.log("Fields are required");
+            return setError("Fields are required");
+        }
+
         try {
             const response = await fetch(`/api/admin/appointment?id=${id}`, {
                 method: "PUT",
@@ -107,27 +133,33 @@ const AppointmentUpdate = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    service: selectedService, // Use selectedService here
-                    appointmentDate,
-                    appointmentTime,
-                    status,
-                    appointmentType,
-                    feedback,
-                    rating,
+                    service: selectedService, 
+                    appointmentDate, 
+                    appointmentTime, 
+                    status, 
+                    appointmentType, 
+                    feedback, 
+                    rating,   
                 }),
             });
+
            
             if (!response.ok) {
+                const errorData = await response.json();
+                console.log("Server error:", errorData);
                 throw new Error("Failed to update appointment");
             }
 
-router.push("/dashboard/appointments");
-            console.log("Appointment updated successfully", response);
+            router.push("/dashboard/appointments");
+            console.log("Appointment updated successfully", await response.json());
+
         } catch (err) {
+            
             console.error("Error updating appointment:", err);
             setError("An error occurred while updating the appointment");
         }
     };
+
 
     if (loading) {
         return (
@@ -171,6 +203,7 @@ router.push("/dashboard/appointments");
                                 </label>
                                 <select
                                     value={selectedService}
+                                    required
                                     onChange={(event) => setSelectedService(event.target.value)}
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
@@ -189,6 +222,7 @@ router.push("/dashboard/appointments");
                                 <input
                                     type="date"
                                     value={appointmentDate}
+                                    required
                                     onChange={(event) => setAppointmentDate(event.target.value)}
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 />
@@ -200,7 +234,9 @@ router.push("/dashboard/appointments");
                                 <input
                                     type="time"
                                     value={appointmentTime}
+                                    required
                                     onChange={(event) => setAppointmentTime(event.target.value)}
+                                    // onChange={handleTimeChange}
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 />
                             </div>
@@ -210,6 +246,7 @@ router.push("/dashboard/appointments");
                                 </label>
                                 <select
                                     value={status}
+                                    required
                                     onChange={(event) => setStatus(event.target.value)}
                                     className="block w-full p-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >

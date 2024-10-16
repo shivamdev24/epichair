@@ -4,8 +4,8 @@ import mongoose, { Document,  Schema } from "mongoose";
 interface IService extends Document {
   name: string;
   description?: string;
-  price?: number; // Price field
-  duration?: number; // Duration field in minutes
+  price: number; // Price field
+  duration: number; // Duration field in minutes
 }
 
 // Create the Service schema
@@ -21,12 +21,12 @@ const ServiceSchema: Schema<IService> = new Schema(
     },
     price: {
       type: Number,
-      required: false, // This field is optional, you can change it if needed
+      required: true, // This field is optional, you can change it if needed
       min: 0, // Ensure price is not negative
     },
     duration: {
       type: Number,
-      required: false, // This field is optional, you can change it if needed
+      required: true, // This field is optional, you can change it if needed
       min: 0, // Ensure duration is not negative
     },
   },

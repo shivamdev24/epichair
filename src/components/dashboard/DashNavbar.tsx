@@ -33,12 +33,17 @@ const Sidebar = () => {
   const pathname = usePathname();
   const [profile, setProfile] = useState<Profile>()
 
+  const [loading, setLoading] = useState(true); // Add loading state
+
   // Check if the current path is '/' or starts with '/auth'
   if (pathname === "/" || pathname.startsWith("/auth")) {
     return null; // Do not render the Sidebar
   }
+
+
   useEffect(() => {
     const getUserDetails = async () => {
+      setLoading(true); // Set loading to true when starting to fetch data
       try {
         const response = await fetch("/api/admin/profile");
         if (!response.ok) {
@@ -49,13 +54,12 @@ const Sidebar = () => {
         console.log(data);
       } catch (error) {
         console.error("Failed to fetch user details", error);
-       
-      } 
+      } finally {
+        setLoading(false); // Set loading to false after fetching
+      }
     };
 
     getUserDetails();
-
-    
   }, []);
 
 
@@ -82,6 +86,12 @@ const Sidebar = () => {
     { name: "Service", href: "/dashboard/service" },
     { name: "Staff", href: "/dashboard/staff" },
   ];
+
+
+
+  if (loading) {
+    return <div>Loading...</div>; // Display loading state
+  }
 
   return (
     <div>

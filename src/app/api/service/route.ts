@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
-import Service from "@/models/Service";
-
 import jwt, { JwtPayload } from "jsonwebtoken";
+import Service from "@/models/Service";
 
 // Connect to the database
 db();
@@ -10,10 +9,6 @@ db();
 const verifyToken = (request: NextRequest) => {
   const authHeader = request.headers.get("Authorization");
   let token: string | null = null;
-  if (!authHeader) {
-    throw new Error("Authorization token is required.");
-
-  }
 
   // Check Authorization header first
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -49,26 +44,26 @@ const verifyToken = (request: NextRequest) => {
   }
 };
 
-
-
+// GET: Fetch all services
 export async function GET(request: NextRequest) {
   try {
     const user = verifyToken(request);
 
     // Check if user is authenticated and is an admin
-   
-    if (!user) {
+    if (!user ) {
       return NextResponse.json(
-        { message: "Authorization required to Get a service." },
+        { message: "Authorization required to access services." },
         { status: 401 }
       );
     }
+
     const services = await Service.find(); // Fetch all services
+    console.log(services);
     return NextResponse.json(services, { status: 200 });
   } catch (error) {
     console.error("Error fetching services:", error);
     return NextResponse.json(
-      { message: "Failed to fetch services.",  },
+      { message: "Failed to fetch services." },
       { status: 500 }
     );
   }

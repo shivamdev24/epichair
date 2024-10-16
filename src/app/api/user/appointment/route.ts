@@ -3,102 +3,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-// import jwt, { JwtPayload } from "jsonwebtoken";
 import { verifyToken } from "@/utils/Token";
+// import Service from "@/models/Service";
+// import User from "@/models/User";
 
 
 db(); 
 
-// const verifyToken = (request: NextRequest) => {
-//   const authHeader = request.headers.get("Authorization");
-//   let token: string | null = null;
 
-//   if (authHeader && authHeader.startsWith("Bearer ")) {
-//     token = authHeader.split(" ")[1];
-//   } else {
-//     token = request.cookies.get("token")?.value || null;
-//   }
-
-//   if (!token) {
-//     console.warn("No authorization token found."); 
-//     return null;
-//   }
-
-//   try {
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.TOKEN_SECRET || "default_secret_key"
-//     );
-
-//     if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-//       return (decoded as JwtPayload).id;
-//     } else {
-//       throw new Error("Invalid token payload.");
-//     }
-//   } catch (error) {
-//     console.error("Token verification error:", {cause: error}); 
-//     return null;
-//   }
-// };
-
-// created by user
-// export async function GET(request: NextRequest) {
-//   try {
-//     const userId = verifyToken(request);
-//     console.log(userId);
-
-//     if (!userId) {
-//       return NextResponse.json(
-//         { message: "Authorization required to GET an appointment." },
-//         { status: 401 }
-//       );
-//     }
-
-
-
-//     const { searchParams } = new URL(request.url);
-//     const appointmentId = searchParams.get("id");
-//     if (!appointmentId) {
-//       return NextResponse.json(
-//         { error: "Appointment Required." },
-//         { status: 404 }
-//       );
-//     }
-
-//    const appointment = await Appointment.findById(appointmentId)
-//      .populate("barber")
-//      .populate("user");
-
-//       if (appointment.user._id.toString() !== userId) {
-//         return NextResponse.json(
-//           { message: "You are not authorized to view this appointment." },
-//           { status: 403 } // Forbidden, as the user doesn't own the appointment
-//         );
-//       }
-
-//    if (!appointment) {
-//      return NextResponse.json(
-//        { error: "Appointment not found." },
-//        { status: 404 }
-//      );
-//    }
-
-//    return NextResponse.json(appointment, { status: 200 });
-    
-//   } catch (error) {
-//     console.error("Error while fetching appointments:", error);
-//     return NextResponse.json(
-//       { message: "Failed to fetch appointments." },
-//       { status: 500 }
-//     );
-//   }
-// }
 
 
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify token and get the user ID
     const userId = verifyToken(request);
     console.log("User ID from token:", userId);
 
@@ -109,11 +26,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch all appointments for the logged-in user
     const appointments = await Appointment.find({ user: userId })
-      .populate("barber") // Populate barber information if needed
-      .populate("service") // Populate barber information if needed
-      .populate("user"); // Populate user information if needed
+      .populate("barber") 
+      .populate("service") 
+      .populate("user"); 
 
     if (!appointments || appointments.length === 0) {
       return NextResponse.json(
@@ -122,7 +38,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Return the appointments for the logged-in user
     return NextResponse.json(appointments, { status: 200 });
   } catch (error) {
     console.error("Error while fetching appointments:", error);
@@ -168,6 +83,156 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+
+
+
+
+
+
+// export async function POST(request: NextRequest) {
+//   try {
+//     const { service, appointmentDate, appointmentTime, barberId } =
+//       await request.json();
+
+//     const userId = verifyToken(request);
+//     if (!userId) {
+//       return NextResponse.json(
+//         { message: "Authorization required to create an appointment." },
+//         { status: 401 }
+//       );
+//     }
+
+//     const barber = await User.findById(barberId);
+//     if (!barber) {
+//       return NextResponse.json(
+//         { message: "Barber not found." },
+//         { status: 404 }
+//       );
+//     }
+
+//     const serviceModel = await Service.findById(service);
+//     if (!serviceModel) {
+//       return NextResponse.json(
+//         { message: "Service not found." },
+//         { status: 404 }
+//       );
+//     }
+
+//     const serviceDurationInMinutes = serviceModel.duration; 
+//     // const endOfRequestedSlot = appointmentTime + serviceDurationInMinutes;
+//     const existingAppointments = await Appointment.find({
+//       barber: barberId,
+//       appointmentDate,
+      
+//     });
+
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     const convertTimeToMinutes = (time: any) => {
+//       const [hours, minutes] = time.split(":").map(Number);
+//       return hours * 60 + minutes;
+//     };
+
+//     const requestedTimeInMinutes = convertTimeToMinutes(appointmentTime);
+
+//     if (existingAppointments.length > 0) {
+//       let nextAvailableTime = requestedTimeInMinutes; 
+//       let hasPending = false;
+
+//       for (const appointment of existingAppointments) {
+//         const appointmentTimeInMinutes = convertTimeToMinutes(
+//           appointment.appointmentTime
+//         );
+
+//         if (appointment.status === "pending") {
+//           hasPending = true;
+
+//           nextAvailableTime = Math.max(
+//             nextAvailableTime,
+//             appointmentTimeInMinutes + serviceDurationInMinutes
+//           );
+//         } else if (appointment.status === "confirmed") {
+          
+//           nextAvailableTime = Math.max(
+//             nextAvailableTime,
+//             appointmentTimeInMinutes + serviceDurationInMinutes
+//           );
+//         } else if (appointment.status === "cancelled") {
+          
+//           continue;
+//         }
+//       }
+
+//       // Convert nextAvailableTime back to "HH:MM" format for the response
+//       const nextAvailableHour = Math.floor(nextAvailableTime / 60);
+//       const nextAvailableMinute = nextAvailableTime % 60;
+//       const formattedNextAvailableTime = `${String(nextAvailableHour).padStart(
+//         2,
+//         "0"
+//       )}:${String(nextAvailableMinute).padStart(2, "0")}`;
+
+//       // Build the response based on whether there are pending or confirmed appointments
+//       if (hasPending) {
+//         return NextResponse.json({
+//           existingAppointments,
+//           message:
+//             "There is a pending appointment at the selected time. Next available time:",
+//           nextAvailableTime: formattedNextAvailableTime, 
+//         });
+//       } else {
+//         return NextResponse.json({
+//           existingAppointments,
+//           message:
+//             "There is a confirmed appointment at the selected time. Next available time:",
+//           nextAvailableTime: formattedNextAvailableTime, 
+//         });
+//       }
+//     }
+
+//     const newAppointment = new Appointment({
+//       barber: barberId,
+//       user: userId,
+//       service,
+//       appointmentDate,
+//       appointmentTime,
+//     });
+
+//     await newAppointment.save();
+//     return NextResponse.json(
+//       {
+//         message: "Appointment created successfully",
+//         appointment: newAppointment,
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error) {
+//     console.error("Error while creating appointment:", error);
+//     return NextResponse.json(
+//       { message: "Failed to create appointment." },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Update an appointment status pending to cancle by user using ID 
 export async function PUT(request: NextRequest) {

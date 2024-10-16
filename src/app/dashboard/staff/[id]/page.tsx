@@ -21,6 +21,14 @@ interface EditStaffFormProps {
     };
 }
 
+
+interface ServiceType {
+    length: number;
+    _id: string;
+    name: string;
+}
+
+
 const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
     const router = useRouter();
 
@@ -33,7 +41,36 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
     const [services, setServices] = useState<string[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>("");
 
+    const [availableServices, setAvailableServices] = useState<ServiceType[]>([]);
+
     const id = params.id;
+
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const response = await fetch('/api/service'); // Adjust the endpoint as necessary
+                const data = await response.json();
+
+                // Log the entire response to verify what you're receiving
+                console.log("Fetched Services Data:", data);
+
+                // Assuming data is the array of services
+                if (Array.isArray(data)) {
+                    setAvailableServices(data);
+                    console.log("availableServices", data); // Check what you're receiving
+                } else {
+                    console.error("Services data is not in the expected format:", data);
+                }
+            } catch (error) {
+                console.error("Error fetching services:", error);
+            }
+        };
+
+        fetchServices();
+    }, []);
+
+
 
     useEffect(() => {
         if (id) {
@@ -59,18 +96,13 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
         }
     }, [id]);
 
-    const handleServicesChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const updatedServices = [...services];
-        updatedServices[index] = e.target.value;
-        setServices(updatedServices);
-    };
-
-    const addService = () => {
-        setServices((prevServices) => [...prevServices, ""]);
-    };
-
-    const removeService = (index: number) => {
-        setServices((prevServices) => prevServices.filter((_, i) => i !== index));
+    // Handle checkbox change for services
+    const handleServiceChange = (service: string) => {
+        if (services.includes(service)) {
+            setServices(services.filter((s) => s !== service));
+        } else {
+            setServices([...services, service]);
+        }
     };
 
     const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -189,25 +221,28 @@ const EditStaffForm: React.FC<EditStaffFormProps> = ({ params }) => {
                         />
                     </CardContent>
                     <CardContent>
-                        <label>Services:</label>
-                        {services.map((service, index) => (
-                            <div key={index} className="flex items-center mt-2">
-                                <Input
-                                    id="userId"
-                                    type="text"
-                                    value={service}
-                                    required
-                                    onChange={(e) => handleServicesChange(e, index)}
-                                />
-                                <Button type="button" onClick={() => removeService(index)} className="ml-2 bg-red-600 hover:bg-red-500">
-                                    Remove
-                                </Button>
-                            </div>
-                        ))}
-                        <Button type="button" onClick={addService} className="mt-2 bg-green-600 hover:bg-green-500">
-                            Add Service
-                        </Button>
-                    </CardContent>
+                        <label>Services List : ( select services ) <span className="text-red-500">*</span></label>
+                        <div className="flex gap-4 flex-col md:flex-row">
+                            {
+                                availableServices.length > 0 ? (
+                                    availableServices.map((service) => (
+                                        <div key={service._id} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id={service._id} // Using service._id for the checkbox id
+                                                checked={services.includes(service.name)}
+                                                onChange={() => handleServiceChange(service.name)} // Using service._id in the handle function
+                                                className="mr-2"
+                                            />
+                                            <label htmlFor={service._id}>{service.name}</label> {/* Rendering service name */}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No services available.</p>
+                                )
+                            }
+                        </div>
+                    </CardContent >
                     <CardContent>
 
                         <Button type="submit" className="mr-2 w-full bg-blue-500 hover:bg-blue-600">Update User</Button>

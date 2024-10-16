@@ -2,11 +2,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-import { verifyToken } from "@/utils/Token";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-// Connect to the database
 db();
 
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+      throw new Error("Invalid token payload.");
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 
 
