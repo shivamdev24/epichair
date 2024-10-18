@@ -23,7 +23,8 @@ db();
 // Get all reminders for the logged-in user
 export async function GET(request: NextRequest) {
   try {
-    const userId = verifyToken(request); 
+   const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id;
 
     // Fetch all reminders associated with the user
     const reminders = await Reminder.find({ userId });
@@ -41,7 +42,8 @@ export async function GET(request: NextRequest) {
 // Create a new reminder
 export async function POST(request: NextRequest) {
   try {
-    const userId = verifyToken(request); // Get user ID from token
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id; // Get user ID from token
 
     const { title, date, message } = await request.json();
 
@@ -75,7 +77,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
    
-    const userId = verifyToken(request); // Get user ID from token
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad.id; // Get user ID from token
 
     const { _id, title, date, message } = await request.json();
 
@@ -122,7 +125,8 @@ export async function PUT(request: NextRequest) {
 // Delete a reminder
 export async function DELETE(request: NextRequest) {
   try {
-    const userId = verifyToken(request); // Get user ID from token
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad.id; // Get user ID from token
 
     const { _id } = await request.json();
 

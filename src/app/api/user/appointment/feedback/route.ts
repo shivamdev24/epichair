@@ -43,7 +43,8 @@ export async function PUT(request: NextRequest) {
   try {
 
 
-     const tokenId = verifyToken(request);
+      const TokenPayLoad = verifyToken(request);
+      const tokenId = TokenPayLoad.id;
      console.log(tokenId);
 
      if (!tokenId) {
@@ -100,7 +101,8 @@ export async function GET(request: NextRequest) {
   try {
 
 
-    const tokenId = verifyToken(request);
+      const TokenPayLoad = verifyToken(request);
+      const tokenId = TokenPayLoad.id;
     console.log(tokenId);
 
     if (!tokenId) {
@@ -156,7 +158,8 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
 
-    const tokenId = verifyToken(request);
+     const TokenPayLoad = verifyToken(request);
+     const tokenId = TokenPayLoad.id;
     console.log(tokenId);
 
     if (!tokenId) {

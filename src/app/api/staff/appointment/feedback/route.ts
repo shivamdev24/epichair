@@ -12,7 +12,9 @@ db();
 // Retrieve full appointment details including feedback and rating
 export async function GET(request: NextRequest) {
   try {
-    const tokenId = verifyToken(request);
+
+      const TokenPayLoad = verifyToken(request);
+      const tokenId = TokenPayLoad.id;
     console.log(tokenId);
 
     if (!tokenId) {

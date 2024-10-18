@@ -5,7 +5,7 @@ import User from "@/models/User";
 import db from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
@@ -31,7 +31,7 @@ const verifyToken = (request: NextRequest) => {
     );
 
     if (typeof decoded !== "string") {
-      return decoded; // Return the decoded JWT payload (full info)
+      return decoded as JwtPayload; // Return the decoded JWT payload (full info)
     } else {
       throw new Error("Invalid token payload.");
     }

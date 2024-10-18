@@ -11,7 +11,8 @@ db();
 export async function GET(request: NextRequest) {
   try {
     
-    const userId = verifyToken(request);
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad.id;
 
     // Fetch all reminders associated with the user
     const reminders = await Reminder.find({ userId });
@@ -28,20 +29,41 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-   
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id; // Get user ID from token
+
     const { title, date, message } = await request.json();
-    const newReminder = new Reminder({ title, date, message });
+
+    // Validate input
+    if (!title || !date || !message) {
+      return NextResponse.json(
+        { error: "Title, date, and message are required." },
+        { status: 400 }
+      );
+    }
+
+    const newReminder = new Reminder({
+      title,
+      date,
+      message,
+      userId, // Use userId from the decoded token
+    });
     await newReminder.save();
+
     return NextResponse.json(newReminder, { status: 201 });
   } catch (error) {
     console.error("Error creating reminder:", error);
-    return NextResponse.json({ error }, { status: 401 });
+    return NextResponse.json(
+      { error: "Failed to create reminder." },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
   try {
-    const userId = verifyToken(request); // Get user ID from token
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id; // Get user ID from token
 
     const { _id, title, date, message } = await request.json();
 

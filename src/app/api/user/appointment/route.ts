@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
 import { verifyToken } from "@/utils/Token";
-// import Service from "@/models/Service";
-// import User from "@/models/User";
+import Service from "@/models/Service";
+import User from "@/models/User";
 
 
 db(); 
@@ -16,7 +16,9 @@ db();
 
 export async function GET(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
+    
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad.id;
     console.log("User ID from token:", userId);
 
     if (!userId) {
@@ -50,39 +52,39 @@ export async function GET(request: NextRequest) {
 
 
 // Create a new appointment
-export async function POST(request: NextRequest) {
-  try {
-    const { service, appointmentDate, appointmentTime, barber } =
-      await request.json();
+// export async function POST(request: NextRequest) {
+//   try {
+//     const { service, appointmentDate, appointmentTime, barber } =
+//       await request.json();
 
-    const userId = verifyToken(request);
-    console.log(userId)
+//     const userId = verifyToken(request);
+//     console.log(userId)
 
-    if(!userId){
-       return NextResponse.json(
-         { message: "Authorization required to create an appointment." },
-         { status: 401 }
-       );
-    }
+//     if(!userId){
+//        return NextResponse.json(
+//          { message: "Authorization required to create an appointment." },
+//          { status: 401 }
+//        );
+//     }
 
-    const newAppointment = new Appointment({
-      barber,
-      user: userId,
-      service,
-      appointmentDate,
-      appointmentTime,
-    });
+//     const newAppointment = new Appointment({
+//       barber,
+//       user: userId,
+//       service,
+//       appointmentDate,
+//       appointmentTime,
+//     });
 
-    await newAppointment.save();
-    return NextResponse.json(newAppointment, { status: 201 });
-  } catch (error) {
-    console.error("Error while creating appointment:", error);
-    return NextResponse.json(
-      { message: "Failed to create appointment." },
-      { status: 500 }
-    );
-  }
-}
+//     await newAppointment.save();
+//     return NextResponse.json(newAppointment, { status: 201 });
+//   } catch (error) {
+//     console.error("Error while creating appointment:", error);
+//     return NextResponse.json(
+//       { message: "Failed to create appointment." },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 
 
@@ -218,6 +220,144 @@ export async function POST(request: NextRequest) {
 
 
 
+export async function POST(request: NextRequest) {
+  try {
+    const { service, appointmentDate, appointmentTime, barberId } =
+      await request.json();
+
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id;
+    
+    if (!userId) {
+      return NextResponse.json(
+        { message: "Authorization required to create an appointment." },
+        { status: 401 }
+      );
+    }
+
+    // Get the current date and time
+    const now = new Date();
+
+    // Convert appointmentDate and appointmentTime to a Date object
+    const requestedAppointmentDateTime = new Date(
+      `${appointmentDate}T${appointmentTime}:00`
+    );
+
+    // Check if the appointment time has already passed for today's date
+    if (requestedAppointmentDateTime < now) {
+      return NextResponse.json(
+        { message: "Cannot create an appointment for a past time." },
+        { status: 400 }
+      );
+    }
+
+    const barber = await User.findById(barberId);
+    if (!barber) {
+      return NextResponse.json(
+        { message: "Barber not found." },
+        { status: 404 }
+      );
+    }
+
+    const serviceModel = await Service.findById(service);
+    if (!serviceModel) {
+      return NextResponse.json(
+        { message: "Service not found." },
+        { status: 404 }
+      );
+    }
+
+    const serviceDurationInMinutes = serviceModel.duration;
+    const existingAppointments = await Appointment.find({
+      barber: barberId,
+      appointmentDate,
+    });
+
+    const convertTimeToMinutes = (time: string) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      return hours * 60 + minutes;
+    };
+
+    const requestedTimeInMinutes = convertTimeToMinutes(appointmentTime);
+
+    if (existingAppointments.length > 0) {
+      let nextAvailableTime = requestedTimeInMinutes;
+      let hasPending = false;
+
+      for (const appointment of existingAppointments) {
+        const appointmentTimeInMinutes = convertTimeToMinutes(
+          appointment.appointmentTime
+        );
+
+        if (appointment.status === "pending") {
+          hasPending = true;
+
+          nextAvailableTime = Math.max(
+            nextAvailableTime,
+            appointmentTimeInMinutes + serviceDurationInMinutes
+          );
+        } else if (appointment.status === "confirmed") {
+          nextAvailableTime = Math.max(
+            nextAvailableTime,
+            appointmentTimeInMinutes + serviceDurationInMinutes
+          );
+        } else if (appointment.status === "cancelled") {
+          continue;
+        }
+      }
+
+      const nextAvailableHour = Math.floor(nextAvailableTime / 60);
+      const nextAvailableMinute = nextAvailableTime % 60;
+      const formattedNextAvailableTime = `${String(nextAvailableHour).padStart(
+        2,
+        "0"
+      )}:${String(nextAvailableMinute).padStart(2, "0")}`;
+
+      if (hasPending) {
+        return NextResponse.json({
+          existingAppointments,
+          message:
+            "There is a pending appointment at the selected time. Next available time:",
+          nextAvailableTime: formattedNextAvailableTime,
+        });
+      } else {
+        return NextResponse.json({
+          existingAppointments,
+          message:
+            "There is a confirmed appointment at the selected time. Next available time:",
+          nextAvailableTime: formattedNextAvailableTime,
+        });
+      }
+    }
+
+    const newAppointment = new Appointment({
+      barber: barberId,
+      user: userId,
+      service,
+      appointmentDate,
+      appointmentTime,
+    });
+
+    await newAppointment.save();
+    return NextResponse.json(
+      {
+        message: "Appointment created successfully",
+        appointment: newAppointment,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error("Error while creating appointment:", error);
+    return NextResponse.json(
+      { message: "Failed to create appointment." },
+      { status: 500 }
+    );
+  }
+}
+
+
+
+
 
 
 
@@ -239,7 +379,8 @@ export async function PUT(request: NextRequest) {
   try {
     const { _id, status, service, appointmentDate, appointmentTime } =
       await request.json();
-   const userId = verifyToken(request);
+     const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id;
    console.log(userId);
 
    if (!userId) {
@@ -276,7 +417,9 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { _id } = await request.json();
-   const userId = verifyToken(request);
+    
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad.id;
    console.log(userId);
 
    if (!userId) {

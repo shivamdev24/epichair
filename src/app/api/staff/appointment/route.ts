@@ -10,7 +10,8 @@ db();
 export async function GET(request: NextRequest) {
   try {
     // Verify token and get the user ID
-    const userId = verifyToken(request);
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad.id;
     console.log("User ID from token:", userId);
 
     if (!userId) {
@@ -51,7 +52,8 @@ export async function PUT(request: NextRequest) {
   try {
     const { _id, status, service, appointmentDate, appointmentTime } =
       await request.json();
-    const userId = verifyToken(request);
+      const TokenPayLoad = verifyToken(request);
+      const userId = TokenPayLoad.id;
     console.log(userId);
 
     if (!userId) {
@@ -85,35 +87,37 @@ export async function PUT(request: NextRequest) {
 }
 
 // Delete an appointment by ID
-export async function DELETE(request: NextRequest) {
-  try {
-    const { _id } = await request.json();
-    const userId = verifyToken(request);
-    console.log(userId);
+// export async function DELETE(request: NextRequest) {
+//   try {
+//     const { _id } = await request.json();
+    
+    
+//     const TokenPayLoad = verifyToken(request);
+//     const userId = TokenPayLoad.id;
+//     console.log(userId);
+//     if (!userId) {
+//       return NextResponse.json(
+//         { message: "Authorization required to Delete an appointment." },
+//         { status: 401 }
+//       );
+//     }
+//     const deletedAppointment = await Appointment.findByIdAndDelete(_id);
+//     if (!deletedAppointment) {
+//       return NextResponse.json(
+//         { error: "Appointment not found." },
+//         { status: 404 }
+//       );
+//     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { message: "Authorization required to Delete an appointment." },
-        { status: 401 }
-      );
-    }
-    const deletedAppointment = await Appointment.findByIdAndDelete(_id);
-    if (!deletedAppointment) {
-      return NextResponse.json(
-        { error: "Appointment not found." },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Appointment deleted successfully." },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error while deleting appointment:", error);
-    return NextResponse.json(
-      { message: "Failed to delete appointment." },
-      { status: 500 }
-    );
-  }
-}
+//     return NextResponse.json(
+//       { message: "Appointment deleted successfully." },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error while deleting appointment:", error);
+//     return NextResponse.json(
+//       { message: "Failed to delete appointment." },
+//       { status: 500 }
+//     );
+//   }
+// }
