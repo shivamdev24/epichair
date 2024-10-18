@@ -127,14 +127,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import HashLoader from "react-spinners/HashLoader";
 
-export default function VerifyOtpComponent() {
+function VerifyOtpComponent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const email = searchParams.get("email");
@@ -181,13 +181,14 @@ export default function VerifyOtpComponent() {
             setLoading(false);
         }
     };
+
     return (
         <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
             {loading && (
                 <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center text-6xl z-50">
                     <HashLoader
                         color="#000"
-                        loading={loading}
+loading={loading}
                         size={80}
                         aria-label="Loading Spinner"
                         data-testid="loader"
@@ -217,6 +218,22 @@ export default function VerifyOtpComponent() {
             )}
         </div>
     );
-    
 }
 
+// Wrap the component in Suspense for client-side rendering
+export default function VerifyOtpPage() {
+    return (
+        <Suspense fallback={<>
+            <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center text-6xl z-50">
+                <HashLoader
+                    color="#000"
+
+                    size={80}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                />
+            </p></>}>
+            <VerifyOtpComponent />
+        </Suspense>
+    );
+}
