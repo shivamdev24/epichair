@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       });
 
       const response = NextResponse.json(
-        { message: "Signup successful.", role: user.role, token },
+        { message: "Signup successful.", tokenData, token },
         { status: 200 }
       );
 

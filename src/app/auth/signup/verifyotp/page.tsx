@@ -178,11 +178,17 @@ function VerifyOtpComponent() {
 
     return (
         <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
-            {loading && (
-                <div className="flex mx-auto h-screen justify-center items-center text-6xl">
-                    <HashLoader color="#000" size={80} />
-                </div>
-            )}
+            {loading ? (
+                <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center z-50 text-6xl">
+                    <HashLoader
+                        color="#000"
+                        loading={loading}
+                        size={80}
+                        aria-label="Loading Spinner"
+                        data-testid="loader"
+                    />
+                </p>
+            ) : ""}
             {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             {!loading && (
                 <Card className="w-full p-8 flex mx-auto flex-col justify-center items-center ">
@@ -211,7 +217,15 @@ function VerifyOtpComponent() {
 // Wrap the component in Suspense for client-side rendering
 export default function VerifyOtpPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div><p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center z-50 text-6xl">
+            <HashLoader
+                color="#000"
+                
+                size={80}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+            />
+        </p></div>}>
             <VerifyOtpComponent />
         </Suspense>
     );

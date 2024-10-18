@@ -266,7 +266,7 @@ export default function SignInPage() {
     <div className="flex mx-auto flex-col justify-center items-center h-screen relative px-5">
       <div>
         {loading ? (
-          <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center text-6xl">
+          <p className="flex mx-auto h-screen w-screen absolute top-0 left-0 bg-white justify-center items-center z-50 text-6xl">
             <HashLoader
               color="#000"
               loading={loading}

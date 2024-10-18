@@ -28,7 +28,6 @@ const verifyToken = (request: NextRequest) => {
 
     if (typeof decoded !== "string") {
       return decoded as JwtPayload;
-      throw new Error("Invalid token payload.");
     }
   } catch (error) {
     throw new Error("Invalid token.", { cause: error });

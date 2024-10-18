@@ -40,6 +40,7 @@ db();
 export async function GET(request: NextRequest) {
   try {
     const decoded = verifyToken(request);
+  
 
     if (!decoded) {
       return NextResponse.json(
@@ -51,6 +52,7 @@ export async function GET(request: NextRequest) {
     }
 
     const email = decoded.email?.toLowerCase(); // Convert email to lowercase
+    console.log(email)
 
     if (!email) {
       return NextResponse.json(
@@ -108,9 +110,10 @@ export async function GET(request: NextRequest) {
 // Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
+    const decoded = verifyToken(request);
+  
 
-    if (!userId) {
+    if (!decoded) {
       return NextResponse.json(
         {
           message: "Authorization Is Required",
@@ -118,9 +121,8 @@ export async function DELETE(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    const { searchParams } = request.nextUrl;
-    const email = searchParams.get("email");
+ const email = decoded.email?.toLowerCase();
+   
 
     if (!email) {
       return NextResponse.json(
@@ -154,86 +156,88 @@ export async function DELETE(request: NextRequest) {
 
 
 
-export async function PUT(request: NextRequest) {
-  try {
-    const decoded = verifyToken(request);
+// export async function PUT(request: NextRequest) {
+//   try {
+//     const decoded = verifyToken(request);
 
-    if (!decoded) {
-      return NextResponse.json(
-        {
-          message: "Authorization is required",
-        },
-        { status: 401 }
-      );
-    }
+   
 
-    const userId = decoded.id; // Extract user ID from decoded token
-    const email = decoded.email?.toLowerCase(); // Extract email from decoded token
+//     if (!decoded) {
+//       return NextResponse.json(
+//         {
+//           message: "Authorization is required",
+//         },
+//         { status: 401 }
+//       );
+//     }
 
-    // Validate user ID and email
-    if (!userId) {
-      return NextResponse.json(
-        { message: "User ID is required." },
-        { status: 400 }
-      );
-    }
+//     const userId = decoded.id; // Extract user ID from decoded token
+//     const email = decoded.email?.toLowerCase(); // Extract email from decoded token
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required." },
-        { status: 400 }
-      );
-    }
+//     // Validate user ID and email
+//     if (!userId) {
+//       return NextResponse.json(
+//         { message: "User ID is required." },
+//         { status: 400 }
+//       );
+//     }
 
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email address format." },
-        { status: 400 }
-      );
-    }
+//     if (!email) {
+//       return NextResponse.json(
+//         { message: "Email is required." },
+//         { status: 400 }
+//       );
+//     }
 
-    const { name } = await request.json();
+//     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+//       return NextResponse.json(
+//         { message: "Invalid email address format." },
+//         { status: 400 }
+//       );
+//     }
 
-    if (!name) {
-      return NextResponse.json(
-        { message: "Name is required." },
-        { status: 400 }
-      );
-    }
+//     const { name } = await request.json();
 
-    // Find the user by ID
-    const user = await User.findById(userId);
+//     if (!name) {
+//       return NextResponse.json(
+//         { message: "Name is required." },
+//         { status: 400 }
+//       );
+//     }
 
-    if (!user) {
-      return NextResponse.json({ message: "User not found." }, { status: 404 });
-    }
+//     // Find the user by ID
+//     const user = await User.findById(userId);
 
-    // Update user information
-    user.username = name;
+//     if (!user) {
+//       return NextResponse.json({ message: "User not found." }, { status: 404 });
+//     }
 
-    await user.save();
+//     // Update user information
+//     user.username = name;
 
-    return NextResponse.json(
-      {
-        message: "User information updated successfully.",
-        user,
-        // user: {
-        //   email: user.email,
-        //   name: user.username,
-        //   role: user.role,
-        //   isVerified: user.isVerified,
-        // },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating user:", error);
-    return NextResponse.json(
-      { message: "Error updating user", error },
-      { status: 500 }
-    );
-  }
-}
+//     await user.save();
+
+//     return NextResponse.json(
+//       {
+//         message: "User information updated successfully.",
+//         user,
+//         // user: {
+//         //   email: user.email,
+//         //   name: user.username,
+//         //   role: user.role,
+//         //   isVerified: user.isVerified,
+//         // },
+//       },
+//       { status: 200 }
+//     );
+//   } catch (error) {
+//     console.error("Error updating user:", error);
+//     return NextResponse.json(
+//       { message: "Error updating user", error },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 
 interface ImageUploadResponse {
@@ -248,6 +252,9 @@ export async function PATCH(request: NextRequest) {
     // Verify token and extract user data
     const decoded = verifyToken(request);
 
+
+    console.log(decoded)
+
     if (!decoded) {
       return NextResponse.json(
         {
@@ -259,7 +266,7 @@ export async function PATCH(request: NextRequest) {
 
     const userId = decoded.id; // Extract user ID from decoded token
     const email = decoded.email?.toLowerCase(); // Extract email from decoded token
-
+console.log(email,userId)
     // Validate user ID and email
     if (!userId) {
       return NextResponse.json(
