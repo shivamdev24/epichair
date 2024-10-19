@@ -13,8 +13,8 @@ db();
 export async function GET(request: NextRequest) {
   try {
 
-      const TokenPayLoad = verifyToken(request);
-      const decoded = TokenPayLoad.id;
+      const decoded = verifyToken(request);
+      // const decoded = TokenPayLoad.id;
 
     if (!decoded) {
       return NextResponse.json(
@@ -81,8 +81,8 @@ export async function GET(request: NextRequest) {
 // Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-     const TokenPayLoad = verifyToken(request);
-     const userId = TokenPayLoad.id;
+     const userId = verifyToken(request);
+    //  const userId = TokenPayLoad.id;
 
     if (!userId) {
       return NextResponse.json(
@@ -215,8 +215,8 @@ interface ImageUploadResponse {
 export async function PATCH(request: NextRequest) {
   try {
     // Verify token and extract user data
-    const TokenPayLoad = verifyToken(request);
-    const decoded = TokenPayLoad.id;
+    const decoded = verifyToken(request);
+    // const decoded = TokenPayLoad.id;
     
 
     if (!decoded) {
@@ -230,6 +230,9 @@ export async function PATCH(request: NextRequest) {
 
     const userId = decoded.id; // Extract user ID from decoded token
     const email = decoded.email?.toLowerCase(); // Extract email from decoded token
+
+
+    console.log(userId)
 
     // Validate user ID and email
     if (!userId) {
