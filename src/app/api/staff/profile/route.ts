@@ -1,20 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import db from "@/utils/db";
-import { verifyToken } from "@/utils/Token";
 import { DeleteImage, UploadImage } from "@/lib/upload-Image";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
 
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
 
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 
 export async function GET(request: NextRequest) {
   try {
-
-      const decoded = verifyToken(request);
-      // const decoded = TokenPayLoad.id;
+    const decoded = verifyToken(request);
 
     if (!decoded) {
       return NextResponse.json(
@@ -25,45 +48,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const email = decoded.email?.toLowerCase(); // Convert email to lowercase
+    const UserId = decoded?.id; 
 
-    if (!email) {
+    if (!UserId) {
       return NextResponse.json(
-        { message: "Email is required.", email },
+        { message: "UserId is required.", UserId },
         { status: 400 }
       );
     }
 
-    // Validate email address format
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email address format." },
-        { status: 400 }
-      );
-    }
+    
 
     // Query the user by email
-    const user = await User.findOne({ email });
+    const user = await User.findById( UserId );
 
     if (!user) {
       return NextResponse.json(
-        { message: `User  with email ${email} not found.`, user },
+        { message: `User  with userId: ${UserId} not found.`, user },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-        // user: {
-        //   id: user._id,
-        //   email: user.email,
-        //   name: user.username,
-        //   image_url: user.image_url,
-        //   public_id: user.public_id,
-        //   OtpExpiry: user.otpExpiry,
-        //   role: user.role,
-        // },
-        user,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.username,
+          image_url: user.image_url,
+          role: user.role,
+        },
+        // user,
       },
       { status: 200 }
     );
@@ -78,11 +93,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
+
 // Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-     const userId = verifyToken(request);
-    //  const userId = TokenPayLoad.id;
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad?.id;
 
     if (!userId) {
       return NextResponse.json(
@@ -93,17 +109,11 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { searchParams } = request.nextUrl;
-    const email = searchParams.get("email");
+   
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required." },
-        { status: 400 }
-      );
-    }
+ 
 
-    const user = await User.findOneAndDelete({ email });
+    const user = await User.findByIdAndDelete(userId);
 
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
@@ -229,7 +239,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const userId = decoded.id; // Extract user ID from decoded token
-    const email = decoded.email?.toLowerCase(); // Extract email from decoded token
+   
 
 
     console.log(userId)
@@ -242,20 +252,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required." },
-        { status: 400 }
-      );
-    }
+   
 
     // Validate email format
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email address format." },
-        { status: 400 }
-      );
-    }
+    
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });

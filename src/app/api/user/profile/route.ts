@@ -1,47 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/User";
 import db from "@/utils/db";
-// import jwt, { JwtPayload } from "jsonwebtoken";
-import { verifyToken } from "@/utils/Token";
+// import { verifyToken } from "@/utils/Token";
 import { DeleteImage, UploadImage } from "@/lib/upload-Image";
+
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
-// const verifyToken = (request: NextRequest) => {
-//   const authHeader = request.headers.get("Authorization");
-//   let token: string | null = null;
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
 
-//   if (authHeader && authHeader.startsWith("Bearer ")) {
-//     token = authHeader.split(" ")[1];
-//   } else {
-//     token = request.cookies.get("token")?.value || null;
-//   }
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
 
-//   if (!token) {
-//     throw new Error("Authorization token is required.");
-//   }
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
 
-//   try {
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.TOKEN_SECRET || "default_secret_key"
-//     );
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
 
-//     if (typeof decoded !== "string") {
-//       return decoded as JwtPayload; 
-//       throw new Error("Invalid token payload.");
-//     }
-//   } catch (error) {
-//     throw new Error("Invalid token.", { cause: error });
-//   }
-// };
-
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 export async function GET(request: NextRequest) {
   try {
-   const TokenPayLoad = verifyToken(request);
-   const decoded = TokenPayLoad.id;
-  
+    const decoded = verifyToken(request);
 
     if (!decoded) {
       return NextResponse.json(
@@ -53,7 +50,6 @@ export async function GET(request: NextRequest) {
     }
 
     const email = decoded.email?.toLowerCase(); // Convert email to lowercase
-    console.log(email)
 
     if (!email) {
       return NextResponse.json(
@@ -75,23 +71,22 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { message: `User  with email ${email} not found.` , user},
+        { message: `User  with email ${email} not found.`, user },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-        // user: {
-        //   id: user._id,
-        //   email: user.email,
-        //   name: user.username,
-        //   image_url: user.image_url,
-        //   public_id: user.public_id,
-        //   OtpExpiry: user.otpExpiry,
-        //   role: user.role,
-        // },
-        user,
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.username,
+          image_url: user.image_url,
+          public_id: user.public_id,
+          OtpExpiry: user.otpExpiry,
+          role: user.role,
+        },
       },
       { status: 200 }
     );
@@ -111,8 +106,8 @@ export async function GET(request: NextRequest) {
 // Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-    const TokenPayLoad = verifyToken(request);
-    const decoded = TokenPayLoad.id;
+    const decoded = verifyToken(request);
+    // const decoded = TokenPayLoad.id;
 
     if (!decoded) {
       return NextResponse.json(
@@ -252,8 +247,8 @@ export async function PATCH(request: NextRequest) {
   try {
     // Verify token and extract user data
 
-     const TokenPayLoad = verifyToken(request);
-     const decoded = TokenPayLoad.id;
+     const decoded = verifyToken(request);
+    //  const decoded = TokenPayLoad.id;
 
 
     console.log(decoded)

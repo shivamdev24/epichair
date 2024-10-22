@@ -11,8 +11,8 @@ db();
 export async function GET(request: NextRequest) {
   try {
     
-     const TokenPayLoad = verifyToken(request);
-     const userId = TokenPayLoad.id;
+     const userId = verifyToken(request);
+    //  const userId = TokenPayLoad.id;
 
     // Fetch all reminders associated with the user
     const reminders = await Reminder.find({ userId });
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const TokenPayLoad = verifyToken(request);
-    const userId = TokenPayLoad.id; // Get user ID from token
+    const userId = verifyToken(request);
+    // const userId = TokenPayLoad.id; // Get user ID from token
 
     const { title, date, message } = await request.json();
 
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const TokenPayLoad = verifyToken(request);
-    const userId = TokenPayLoad.id; // Get user ID from token
+    const userId = verifyToken(request);
+    // const userId = TokenPayLoad.id; // Get user ID from token
 
     const { _id, title, date, message } = await request.json();
 

@@ -13,8 +13,8 @@ db();
 export async function GET(request: NextRequest) {
   try {
 
-      const TokenPayLoad = verifyToken(request);
-      const tokenId = TokenPayLoad.id;
+      const tokenId = verifyToken(request);
+      // const tokenId = TokenPayLoad.id;
     console.log(tokenId);
 
     if (!tokenId) {

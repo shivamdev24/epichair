@@ -17,8 +17,9 @@ db();
 export async function GET(request: NextRequest) {
   try {
     
-     const TokenPayLoad = verifyToken(request);
-     const userId = TokenPayLoad.id;
+    //  const TokenPayLoad = verifyToken(request);
+    // const userId = TokenPayLoad.id;
+     const userId = verifyToken(request);
     console.log("User ID from token:", userId);
 
     if (!userId) {
@@ -61,8 +62,9 @@ export async function POST(request: NextRequest) {
       await request.json();
 
     // Verify token and extract the user ID
-    const TokenPayload = verifyToken(request);
-    const userId = TokenPayload?.id;
+     const userId = verifyToken(request);
+    // const TokenPayload = verifyToken(request);
+    // const userId = TokenPayload?.id;
     if (!userId) {
       return NextResponse.json(
         { message: "Authorization required to create an appointment." },
@@ -256,8 +258,9 @@ export async function PUT(request: NextRequest) {
       await request.json();
 
     // Verify token and extract the user ID
-    const TokenPayLoad = verifyToken(request);
-    const userId = TokenPayLoad?.id;
+    const userId = verifyToken(request);
+    // const TokenPayLoad = verifyToken(request);
+    // const userId = TokenPayLoad?.id;
     if (!userId) {
       return NextResponse.json(
         { message: "Authorization required to update an appointment." },
@@ -343,8 +346,9 @@ export async function DELETE(request: NextRequest) {
   try {
     const { _id } = await request.json();
     
-     const TokenPayLoad = verifyToken(request);
-     const userId = TokenPayLoad.id;
+     const userId = verifyToken(request);
+    //  const TokenPayLoad = verifyToken(request);
+    //  const userId = TokenPayLoad.id;
    console.log(userId);
 
    if (!userId) {
