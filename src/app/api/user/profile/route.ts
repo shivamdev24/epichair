@@ -38,10 +38,10 @@ const verifyToken = (request: NextRequest) => {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = verifyToken(request);
-    const decoded = token?.id;
+    const TokenPayLoad = verifyToken(request);
+    const UserId = TokenPayLoad?.id;
 
-    if (!decoded) {
+    if (!TokenPayLoad) {
       return NextResponse.json(
         {
           message: "Authorization is required",
@@ -50,44 +50,33 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const email = token?.email?.toLowerCase(); // Convert email to lowercase
-
-    if (!email) {
+    if (!UserId) {
       return NextResponse.json(
-        { message: "Email is required.", email },
-        { status: 400 }
-      );
-    }
-
-    // Validate email address format
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email address format." },
+        { message: "UserId is required.", UserId },
         { status: 400 }
       );
     }
 
     // Query the user by email
-    const user = await User.findOne({ email });
+    const user = await User.findById(UserId);
 
     if (!user) {
       return NextResponse.json(
-        { message: `User  with email ${email} not found.`, user },
+        { message: `User  with userId: ${UserId} not found.`, user },
         { status: 404 }
       );
     }
 
     return NextResponse.json(
       {
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.username,
-          image_url: user.image_url,
-          public_id: user.public_id,
-          OtpExpiry: user.otpExpiry,
-          role: user.role,
-        },
+        // user: {
+        //   id: user._id,
+        //   email: user.email,
+        //   name: user.username,
+        //   image_url: user.image_url,
+        //   role: user.role,
+        // },
+        user,
       },
       { status: 200 }
     );
@@ -264,8 +253,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const userId = decoded.id; // Extract user ID from decoded token
-    const email = decoded.email?.toLowerCase(); // Extract email from decoded token
-console.log(email,userId)
+   
     // Validate user ID and email
     if (!userId) {
       return NextResponse.json(
@@ -274,20 +262,8 @@ console.log(email,userId)
       );
     }
 
-    if (!email) {
-      return NextResponse.json(
-        { message: "Email is required." },
-        { status: 400 }
-      );
-    }
-
-    // Validate email format
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-      return NextResponse.json(
-        { message: "Invalid email address format." },
-        { status: 400 }
-      );
-    }
+   
+  
     const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
