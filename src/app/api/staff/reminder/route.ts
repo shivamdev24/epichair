@@ -3,16 +3,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import Reminder from "@/models/Reminder";
 import db from "@/utils/db";
-import { verifyToken } from "@/utils/Token";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
+
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 
 export async function GET(request: NextRequest) {
   try {
     
-     const userId = verifyToken(request);
-    //  const userId = TokenPayLoad.id;
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad?.id;
 
     // Fetch all reminders associated with the user
     const reminders = await Reminder.find({ userId });
@@ -29,8 +57,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
-    // const userId = TokenPayLoad.id; // Get user ID from token
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id; // Get user ID from token
 
     const { title, date, message } = await request.json();
 
@@ -62,8 +90,8 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
-    // const userId = TokenPayLoad.id; // Get user ID from token
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id; // Get user ID from token
 
     const { _id, title, date, message } = await request.json();
 

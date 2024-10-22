@@ -38,7 +38,8 @@ const verifyToken = (request: NextRequest) => {
 
 export async function GET(request: NextRequest) {
   try {
-    const decoded = verifyToken(request);
+    const token = verifyToken(request);
+    const decoded = token?.id;
 
     if (!decoded) {
       return NextResponse.json(
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const email = decoded.email?.toLowerCase(); // Convert email to lowercase
+    const email = token?.email?.toLowerCase(); // Convert email to lowercase
 
     if (!email) {
       return NextResponse.json(

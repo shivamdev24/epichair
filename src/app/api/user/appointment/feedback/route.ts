@@ -1,51 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-import { verifyToken } from "@/utils/Token";
-// import jwt, { JwtPayload } from "jsonwebtoken";
+// import { verifyToken } from "@/utils/Token";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 db();
 
-// const verifyToken = (request: NextRequest) => {
-//   const authHeader = request.headers.get("Authorization");
-//   let token: string | null = null;
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
 
-//   if (authHeader && authHeader.startsWith("Bearer ")) {
-//     token = authHeader.split(" ")[1];
-//   } else {
-//     token = request.cookies.get("token")?.value || null;
-//   }
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
 
-//   if (!token) {
-//     console.warn("No authorization token found.");
-//     return null;
-//   }
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
 
-//   try {
-//     const decoded = jwt.verify(
-//       token,
-//       process.env.TOKEN_SECRET || "default_secret_key"
-//     );
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
 
-//     if (typeof decoded !== "string" && (decoded as JwtPayload).id) {
-//       return (decoded as JwtPayload).id;
-//     } else {
-//       throw new Error("Invalid token payload.");
-//     }
-//   } catch (error) {
-//     console.error("Token verification error:", { cause: error });
-//     return null;
-//   }
-// };
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 
 export async function PUT(request: NextRequest) {
   try {
 
 
-      const tokenId = verifyToken(request);
-      // const TokenPayLoad = verifyToken(request);
-      // const tokenId = TokenPayLoad.id;
+      // const tokenId = verifyToken(request);
+      const TokenPayLoad = verifyToken(request);
+      const tokenId = TokenPayLoad?.id;
      console.log(tokenId);
 
      if (!tokenId) {
@@ -102,10 +98,11 @@ export async function GET(request: NextRequest) {
   try {
 
 
-    const tokenId = verifyToken(request);
-      // const TokenPayLoad = verifyToken(request);
-      // const tokenId = TokenPayLoad.id;
+    // const tokenId = verifyToken(request);
+      const TokenPayLoad = verifyToken(request);
+      const tokenId = TokenPayLoad?.id;
     console.log(tokenId);
+    console.log(TokenPayLoad);
 
     if (!tokenId) {
       return NextResponse.json(
@@ -119,10 +116,9 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const appointmentId = searchParams.get("appointmentId");
-    const userId = searchParams.get("userId");
 
     // Validate inputs
-    if (!appointmentId || !userId) {
+    if (!appointmentId || !tokenId) {
       return NextResponse.json(
         { error: "Appointment ID and User ID are required." },
         { status: 400 }
@@ -132,10 +128,13 @@ export async function GET(request: NextRequest) {
     // Find the appointment by ID and user ID
     const appointment = await Appointment.findOne({
       _id: appointmentId,
-      user: userId,
-    }).populate("barber") // Assuming you want to fetch barber details as well
+      user: tokenId,
+    })
+      .populate("barber") // Assuming you want to fetch barber details as well
       .populate("user") // Assuming you want to fetch user details as well
-      .select("service appointmentDate appointmentTime feedback rating barber user");
+      .select(
+        "service appointmentDate appointmentTime feedback rating barber user"
+      );
 
     if (!appointment) {
       return NextResponse.json(
@@ -160,10 +159,10 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
 
-    //  const TokenPayLoad = verifyToken(request);
-    //  const tokenId = TokenPayLoad.id;
+     const TokenPayLoad = verifyToken(request);
+     const tokenId = TokenPayLoad?.id;
 
-     const tokenId = verifyToken(request);
+    //  const tokenId = verifyToken(request);
     console.log(tokenId);
 
 

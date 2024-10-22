@@ -27,53 +27,112 @@ const verifyToken = (request: NextRequest) => {
 
     if (typeof decoded !== "string") {
       return decoded as JwtPayload;
-      throw new Error("Invalid token payload.");
     }
   } catch (error) {
     throw new Error("Invalid token.", { cause: error });
   }
 };
 
+
+
+
+
 export async function GET(request: NextRequest) {
   try {
-    // Verify user token
-    const userId = verifyToken(request);
-    console.log(userId);
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id;
 
-    // Check if user is authenticated
+    console.log("User  ID from token:", userId);
+    console.log("Token Payload:", TokenPayLoad);
+
+    if (!TokenPayLoad) {
+      return NextResponse.json(
+        { message: "Authorization required to fetch appointments." },
+        { status: 401 }
+      );
+    }
     if (!userId) {
       return NextResponse.json(
-        { message: "Authorization required to GET appointments." },
+        { message: "userId required to fetch appointments." },
         { status: 401 }
       );
     }
 
-    // Fetch all appointments from the database
-    const appointments = await Appointment.find()
+    const appointments = await Appointment.find({ barber: userId })
       .populate("barber")
-      .populate("user")
-      .populate("service");
+      .populate("service")
+      .populate("user");
 
-    if (!appointments) {
-      console.log("No appointments found.", appointments);
-      return NextResponse.json([], { status: 204 }); // No Content
+    console.log("Appointments for user:", appointments);
+
+    if (!appointments || appointments.length === 0) {
+      return NextResponse.json(
+        { message: "No appointments found for this user." },
+        { status: 404 }
+      );
     }
 
-    console.log(appointments);
-
-    // Check if appointments were fetched successfully
-
-    // Return the list of appointments, or an empty array if none found
-    return NextResponse.json(appointments || [], { status: 200 });
+    return NextResponse.json(appointments, { status: 200 });
   } catch (error) {
     console.error("Error while fetching appointments:", error);
     return NextResponse.json(
-      { message: "Failed to fetch appointments." },
+      { message: "Failed to fetch appointments.", error},
       { status: 500 }
     );
   }
 }
 
+
+
+
+
+
+
+// export async function GET(request: NextRequest) {
+//   try {
+//     const TokenPayLoad = verifyToken(request);
+//     const userId = TokenPayLoad?.id;
+//     //  const userId = verifyToken(request);
+//     console.log("User ID from token:", userId);
+//     console.log("User ID from token:", TokenPayLoad);
+
+//     if (!TokenPayLoad) {
+//       return NextResponse.json(
+//         { message: "Authorization required to fetch appointments." },
+//         { status: 401 }
+//       );
+//     }
+//     if (!userId) {
+//       return NextResponse.json(
+//         { message: "userId required to fetch appointments." },
+//         { status: 401 }
+//       );
+//     }
+
+//     const appointments = await Appointment.find({ user: userId })
+//       .populate("barber")
+//       .populate("service")
+//       .populate("user");
+//       console.log("Appointments for user:", appointments);
+  
+//    if (!appointments || appointments.length === 0) {
+//      return NextResponse.json(
+//        { message: "No appointments found for this user." },
+//        { status: 404 }
+//      );
+//    }
+
+
+
+//     return NextResponse.json(appointments, { status: 200 });
+//   } catch (error) {
+//     console.error("Error while fetching appointments:", error);
+//     return NextResponse.json(
+//       { message: "Failed to fetch appointments." },
+//       { status: 500 }
+//     );
+//   }
+// }
 
 // export async function GET(request: NextRequest) {
 
@@ -174,6 +233,8 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+
 
 // Delete an appointment by ID
 // export async function DELETE(request: NextRequest) {

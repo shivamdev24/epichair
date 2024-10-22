@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   try {
 
       const tokenId = verifyToken(request);
-      // const tokenId = TokenPayLoad.id;
+      // const barberId = tokenId?.id;
     console.log(tokenId);
 
     if (!tokenId) {
@@ -39,17 +39,16 @@ export async function GET(request: NextRequest) {
 
     // Find the appointment by ID and user ID
     const appointment = await Appointment.findOne({
-      _id: appointmentId
+      _id: appointmentId,
+      // barber: barberId,
     })
-      .populate("barber") // Assuming you want to fetch barber details as well
-      .populate("user") // Assuming you want to fetch user details as well
-      .select(
-        "service appointmentDate appointmentTime feedback rating barber user"
-      );
+      // .populate("barber") // Assuming you want to fetch barber details as well
+      // .populate("user") // Assuming you want to fetch user details as well
+      // .select("service ");
 
     if (!appointment) {
       return NextResponse.json(
-        { error: "Appointment not found or does not belong to the user." },
+        { error: "Appointment not found or does not belong to the Barber." },
         { status: 404 }
       );
     }

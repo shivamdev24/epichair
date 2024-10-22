@@ -37,9 +37,11 @@ const verifyToken = (request: NextRequest) => {
 
 export async function GET(request: NextRequest) {
   try {
-    const decoded = verifyToken(request);
 
-    if (!decoded) {
+    const TokenPayLoad = verifyToken(request);
+    const UserId = TokenPayLoad?.id;
+
+    if (!TokenPayLoad) {
       return NextResponse.json(
         {
           message: "Authorization is required",
@@ -48,7 +50,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const UserId = decoded?.id; 
 
     if (!UserId) {
       return NextResponse.json(
@@ -71,14 +72,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        user: {
-          id: user._id,
-          email: user.email,
-          name: user.username,
-          image_url: user.image_url,
-          role: user.role,
-        },
-        // user,
+        // user: {
+        //   id: user._id,
+        //   email: user.email,
+        //   name: user.username,
+        //   image_url: user.image_url,
+        //   role: user.role,
+        // },
+        user,
       },
       { status: 200 }
     );
@@ -225,11 +226,11 @@ interface ImageUploadResponse {
 export async function PATCH(request: NextRequest) {
   try {
     // Verify token and extract user data
-    const decoded = verifyToken(request);
-    // const decoded = TokenPayLoad.id;
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id;
     
 
-    if (!decoded) {
+    if (!TokenPayLoad) {
       return NextResponse.json(
         {
           message: "Authorization is required",
@@ -238,7 +239,6 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const userId = decoded.id; // Extract user ID from decoded token
    
 
 

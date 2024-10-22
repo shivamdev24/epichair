@@ -3,13 +3,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Appointment from "@/models/Appointment";
-import { verifyToken } from "@/utils/Token";
 import Service from "@/models/Service";
 import User from "@/models/User";
 
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-db(); 
+db();
 
+
+
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 
 
 
@@ -17,10 +46,11 @@ db();
 export async function GET(request: NextRequest) {
   try {
     
-    //  const TokenPayLoad = verifyToken(request);
-    // const userId = TokenPayLoad.id;
-     const userId = verifyToken(request);
+     const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id;
+    //  const userId = verifyToken(request);
     console.log("User ID from token:", userId);
+    console.log("User ID from token:", TokenPayLoad);
 
     if (!userId) {
       return NextResponse.json(
@@ -29,17 +59,20 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const appointments = await Appointment.find({ user: userId })
-      .populate("barber") 
-      .populate("service") 
-      .populate("user"); 
+   
+       const appointments = await Appointment.find({ user: userId })
+         .populate("barber")
+         .populate("service")
+         .populate("user");
 
-    if (!appointments || appointments.length === 0) {
-      return NextResponse.json(
-        { message: "No appointments found for this user." },
-        { status: 404 }
-      );
-    }
+       if (!appointments || appointments.length === 0) {
+         return NextResponse.json(
+           { message: "No appointments found for this user." },
+           { status: 404 }
+         );
+       }
+
+    // console.log(appointments);
 
     return NextResponse.json(appointments, { status: 200 });
   } catch (error) {
@@ -62,9 +95,9 @@ export async function POST(request: NextRequest) {
       await request.json();
 
     // Verify token and extract the user ID
-     const userId = verifyToken(request);
-    // const TokenPayload = verifyToken(request);
-    // const userId = TokenPayload?.id;
+    //  const userId = verifyToken(request);
+    const TokenPayload = verifyToken(request);
+    const userId = TokenPayload?.id;
     if (!userId) {
       return NextResponse.json(
         { message: "Authorization required to create an appointment." },
@@ -258,9 +291,9 @@ export async function PUT(request: NextRequest) {
       await request.json();
 
     // Verify token and extract the user ID
-    const userId = verifyToken(request);
-    // const TokenPayLoad = verifyToken(request);
-    // const userId = TokenPayLoad?.id;
+    // const userId = verifyToken(request);
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id;
     if (!userId) {
       return NextResponse.json(
         { message: "Authorization required to update an appointment." },
@@ -346,9 +379,9 @@ export async function DELETE(request: NextRequest) {
   try {
     const { _id } = await request.json();
     
-     const userId = verifyToken(request);
-    //  const TokenPayLoad = verifyToken(request);
-    //  const userId = TokenPayLoad.id;
+    //  const userId = verifyToken(request);
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad?.id;
    console.log(userId);
 
    if (!userId) {

@@ -2,29 +2,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import Reminder from "@/models/Reminder";
-// import jwt, { JwtPayload } from "jsonwebtoken";
-import { verifyToken } from "@/utils/Token";
 
-// Connect to the database
+import jwt, { JwtPayload } from "jsonwebtoken";
+
 db();
 
-// const verifyToken = (token: string | undefined): string => {
-//   if (!token) {
-//     throw new Error("No token provided");
-//   }
-//   try {
-//     const decoded = jwt.verify(token, process.env.TOKEN_SECRET!) as JwtPayload;
-//     return decoded.id; // Return user ID
-//   } catch (error) {
-//     throw new Error("Invalid or expired token", {cause: error});
-//   }
+const verifyToken = (request: NextRequest) => {
+  const authHeader = request.headers.get("Authorization");
+  let token: string | null = null;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else {
+    token = request.cookies.get("token")?.value || null;
+  }
+
+  if (!token) {
+    throw new Error("Authorization token is required.");
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.TOKEN_SECRET || "default_secret_key"
+    );
+
+    if (typeof decoded !== "string") {
+      return decoded as JwtPayload;
+    }
+  } catch (error) {
+    throw new Error("Invalid token.", { cause: error });
+  }
+};
 // };
 
 // Get all reminders for the logged-in user
 export async function GET(request: NextRequest) {
   try {
-   const userId = verifyToken(request);
-    // const userId = TokenPayLoad.id;
+   const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id;
 
     // Fetch all reminders associated with the user
     const reminders = await Reminder.find({ userId });
@@ -42,8 +58,8 @@ export async function GET(request: NextRequest) {
 // Create a new reminder
 export async function POST(request: NextRequest) {
   try {
-    const userId = verifyToken(request);
-    // const userId = TokenPayLoad.id; // Get user ID from token
+    const TokenPayLoad = verifyToken(request);
+    const userId = TokenPayLoad?.id; // Get user ID from token
 
     const { title, date, message } = await request.json();
 
@@ -77,8 +93,8 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
    
-     const userId = verifyToken(request);
-    //  const userId = TokenPayLoad.id; // Get user ID from token
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad?.id; // Get user ID from token
 
     const { _id, title, date, message } = await request.json();
 
@@ -125,8 +141,8 @@ export async function PUT(request: NextRequest) {
 // Delete a reminder
 export async function DELETE(request: NextRequest) {
   try {
-     const userId = verifyToken(request);
-    //  const userId = TokenPayLoad.id; // Get user ID from token
+     const TokenPayLoad = verifyToken(request);
+     const userId = TokenPayLoad?.id; // Get user ID from token
 
     const { _id } = await request.json();
 
