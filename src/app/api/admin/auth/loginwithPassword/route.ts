@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
         name: existingUser.username,
       },
       process.env.TOKEN_SECRET!,
-      { expiresIn: "24h" }
+      
     );
 
     const response = NextResponse.json(
@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 86400, // 30d
     });
 
     

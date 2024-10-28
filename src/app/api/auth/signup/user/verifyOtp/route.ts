@@ -87,9 +87,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const tokenData = { id: user._id, email: user.email, role: user.role };
-      const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-        expiresIn: "1d",
-      });
+      const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!);
 
       const response = NextResponse.json(
         { message: "Signup successful.", tokenData, token },
@@ -100,7 +98,6 @@ export async function POST(request: NextRequest) {
        httpOnly: true,
        secure: process.env.NODE_ENV === "production",
        sameSite: "strict",
-       maxAge: 86400, // 30d
      });
 
       return response;

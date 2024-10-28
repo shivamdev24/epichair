@@ -173,9 +173,7 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token
     const tokenData = { id: user._id, email: user.email, role: user.role };
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!);
 
     const response = NextResponse.json(
       {
@@ -191,7 +189,6 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 86400, // 1 day
     });
 
     return response;
