@@ -96,10 +96,10 @@ export async function GET(request: NextRequest) {
 // Delete user account
 export async function DELETE(request: NextRequest) {
   try {
-    const decoded = verifyToken(request);
-    // const decoded = TokenPayLoad.id;
+    const Payload = verifyToken(request);
+    const id = Payload?.id;
 
-    if (!decoded) {
+    if (!Payload) {
       return NextResponse.json(
         {
           message: "Authorization Is Required",
@@ -107,17 +107,17 @@ export async function DELETE(request: NextRequest) {
         { status: 401 }
       );
     }
- const email = decoded.email?.toLowerCase();
-   
+  // const email = decoded.email?.toLowerCase();
+  //   console.log(email)
 
-    if (!email) {
+    if (!id) {
       return NextResponse.json(
         { message: "Email is required." },
         { status: 400 }
       );
     }
 
-    const user = await User.findOneAndDelete({ email });
+    const user = await User.findByIdAndDelete(id);
 
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
