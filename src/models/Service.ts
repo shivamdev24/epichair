@@ -6,6 +6,8 @@ interface IService extends Document {
   description?: string;
   price: number; // Price field
   duration: number; // Duration field in minutes
+  service_url: string;
+  public_id: string;
 }
 
 // Create the Service schema
@@ -16,6 +18,14 @@ const ServiceSchema: Schema<IService> = new Schema(
       required: true, // This field is required
     },
     description: {
+      type: String,
+      required: false, // Optional field
+    },
+    service_url: {
+      type: String,
+      required: false, // Optional field
+    },
+    public_id: {
       type: String,
       required: false, // Optional field
     },

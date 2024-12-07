@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/utils/db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import Service from "@/models/Service";
+import { DeleteImage, UploadImage } from "@/lib/upload-Image";
+// import { DeleteImage } from "@/lib/upload-Image";
 
 // Connect to the database
 db();
@@ -69,6 +71,20 @@ export async function GET(request: NextRequest) {
   }
 }
 
+
+
+
+
+
+
+
+
+
+interface ImageUploadResponse {
+  secure_url: string;
+  public_id: string;
+}
+
 // POST: Create a new service
 export async function POST(request: NextRequest) {
   try {
@@ -83,11 +99,60 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse request body
-    const { name, description, duration, price } = await request.json();
+    // Parse form data for image and other inputs
+    const formData = await request.formData();
+    const image = formData.get("image") as File | null;
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const duration = formData.get("duration") as string;
+    const price = parseFloat(formData.get("price") as string); // Ensure price is a number
+
+   
+
+    // Initialize image-related variables
+    let service_url: string | undefined;
+    let public_id: string | undefined;
+
+    if (image) {
+      // Validate image size
+      const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+      if (image.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          {
+            error: `File size too large. Maximum is ${
+              MAX_FILE_SIZE / 1024 / 1024
+            } MB.`,
+          },
+          { status: 413 }
+        );
+      }
+
+      // Upload new image to Cloudinary
+      const uploadedImage = (await UploadImage(
+        image,
+        "EpicHair-service-gallery"
+      )) as ImageUploadResponse;
+      console.log("Uploaded image response:", uploadedImage);
+      if (!uploadedImage) {
+        return NextResponse.json(
+          { error: "Failed to upload image." },
+          { status: 500 }
+        );
+      }
+
+      service_url = uploadedImage.secure_url;
+      public_id = uploadedImage.public_id;
+    }
 
     // Create a new service
-    const newService = new Service({ name, description, duration, price });
+    const newService = new Service({
+      name,
+      description,
+      duration,
+      price,
+      service_url,
+      public_id,
+    });
     await newService.save();
 
     return NextResponse.json(newService, { status: 201 });
@@ -99,6 +164,10 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+
+
 
 // PUT: Update an existing service
 export async function PUT(
@@ -158,7 +227,7 @@ export async function DELETE(request: NextRequest) {
     const user = verifyToken(request);
 
     // Check if user is authenticated and is an admin
-    if (!user ) {
+    if (!user) {
       return NextResponse.json(
         { message: "Authorization required to delete a service." },
         { status: 401 }
@@ -175,10 +244,21 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete service by ID
-    const deletedService = await Service.findByIdAndDelete(id);
+    const deletedService = await Service.findById(id);
+    console.log("deletedService", deletedService);
+    // Check if user has an existing image
+    if (deletedService.public_id) {
+      console.log(
+        "Deleting existing image with public_id:",
+        deletedService.public_id
+      );
+      await DeleteImage(deletedService.public_id); // Delete the old image if it exists
+    }
 
-    if (!deletedService) {
+    // Delete service by ID
+    const DeleteService = await Service.findByIdAndDelete(id);
+
+    if (!DeleteService) {
       return NextResponse.json(
         { message: "Service not found." },
         { status: 404 }
@@ -197,3 +277,8 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+
+
+
+
+

@@ -337,6 +337,9 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import Modal from '@/components/dashboard/NewService'; // Import the Modal component
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+
 
 interface Service {
     _id: string;
@@ -344,6 +347,7 @@ interface Service {
     description?: string;
     price?: number;
     duration: number;
+    service_url?: string;
 }
 
 const ServiceManagement = () => {
@@ -449,7 +453,7 @@ const ServiceManagement = () => {
                 <table className="min-w-full border-collapse border border-gray-300">
                     <thead>
                         <tr>
-                            <th className="border border-gray-300 px-4 py-2">Service ID</th>
+                            <th className="border border-gray-300 px-4 py-2">Service Image</th>
                             <th className="border border-gray-300 px-4 py-2">Service Name</th>
                             <th className="border border-gray-300 px-4 py-2">Description</th>
                             <th className="border border-gray-300 px-4 py-2">Price</th>
@@ -460,12 +464,18 @@ const ServiceManagement = () => {
                     <tbody>
                         {currentServices.map((service) => (
                             <tr key={service._id}>
-                                <td className="border border-gray-300 px-4 py-2">{service._id}</td>
-                                <td className="border border-gray-300 px-4 py-2">{service.name}</td>
-                                <td className="border border-gray-300 px-4 py-2">{service.description}</td>
-                                <td className="border border-gray-300 px-4 py-2">{service.price}</td>
-                                <td className="border border-gray-300 px-4 py-2">{service.duration}</td>
-                                <td className="border border-gray-300 px-4 py-2">
+                                <td className="border-b border-t border-gray-300 px-4 py-2 flex justify-center">
+                                    <Avatar>
+                                        <AvatarImage src={service.service_url} alt={service.name} />
+                                        <AvatarFallback>A</AvatarFallback>
+                                    </Avatar>
+
+                                </td>
+                                <td className="border text-center border-gray-300 px-4 py-2">{service.name}</td>
+                                <td className="border text-center border-gray-300 px-4 py-2">{service.description}</td>
+                                <td className="border text-center border-gray-300 px-4 py-2">{service.price}</td>
+                                <td className="border text-center border-gray-300 px-4 py-2">{service.duration}</td>
+                                <td className="border text-center border-gray-300 px-4 py-2">
                                     <button
                                         onClick={() => handleDeleteService(service._id)}
                                         className="text-red-500 hover:underline"
