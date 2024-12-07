@@ -107,7 +107,7 @@ const Dashboard: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-300">
                     <thead className="bg-gray-200">
                         <tr>
-                            <th className="border border-gray-300 px-4 py-2">Staff Id</th>
+                            {/* <th className="border border-gray-300 px-4 py-2">Staff Id</th> */}
                             <th className="border border-gray-300 px-4 py-2">Staff Profile</th>
                             <th className="border border-gray-300 px-4 py-2">Staff Name</th>
                             <th className="border border-gray-300 px-4 py-2">Staff Email</th>
@@ -120,7 +120,7 @@ const Dashboard: React.FC = () => {
                     <tbody>
                         {currentUsers.map((user) => (
                             <tr key={user._id}>
-                                <td className="border border-gray-300 text-center px-4 py-2">{user._id}</td>
+                                {/* <td className="border border-gray-300 text-center px-4 py-2">{user._id}</td> */}
                                 <td className="border border-gray-300 px-4 py-2  "> <div className="flex justify-center items-center">
                                     <Avatar className="">
                                         <AvatarImage src={user?.image_url || 'Not Updated'} className="object-cover object-center" />

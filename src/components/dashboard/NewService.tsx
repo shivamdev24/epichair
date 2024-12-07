@@ -10,7 +10,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { Image, X } from "lucide-react";
 
 interface ModalProps {
     isOpen: boolean;
@@ -178,15 +178,27 @@ const Modal: React.FC<ModalProps> = ({
                                 </div>
                             </div>
 
-                            <div className="text-lg mb-3">
-                                <label>Upload Image:</label>
+                            <div className="text-lg mb-3 flex gap-2 items-end">
+                                <div className='flex gap-2 items-center'>
+                                    <span>Upload Image :</span>
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="cursor-pointer flex items-center justify-center w-20 h-10 rounded  bg-gray-950 hover:bg-gray-600 duration-500"
+                                    >
+                                        <Image className="w-6 h-6 rounded text-white" />
+                                    </label>
+                                </div>
+                                    <span className="text-xs text-red-400">Format : png / jpg</span>
+                                
+
                                 <input
+                                    id="file-upload"
                                     type="file"
                                     accept="image/*"
                                     onChange={(e) =>
                                         setImage(e.target.files ? e.target.files[0] : null)
                                     }
-                                    className="border rounded border-gray-300 px-2 py-1 mr-2 w-full"
+                                    className="hidden"
                                 />
                             </div>
 

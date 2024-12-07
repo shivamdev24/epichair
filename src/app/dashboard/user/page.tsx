@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 
 interface User {
@@ -91,7 +92,8 @@ const Dashboard = () => {
                     <thead>
                         <tr>
                             <th className="border border-gray-300 px-4 py-2">Email</th>
-                            <th className="border border-gray-300 px-4 py-2">User ID</th>
+                            <th className="border border-gray-300 px-4 py-2">User Profile</th>
+                            <th className="border border-gray-300 px-4 py-2">User Id</th>
                             <th className="border border-gray-300 px-4 py-2">Username</th> {/* Added Username */}
                             <th className="border border-gray-300 px-4 py-2">Role</th>
                             <th className="border border-gray-300 px-4 py-2">Verifief</th>
@@ -103,7 +105,11 @@ const Dashboard = () => {
                             <tr key={user._id}>
                                 
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.email}</td>
-                                <td className="border border-gray-300 px-4 py-4 text-center">{user._id}</td>
+                                <td className="border border-gray-300 px-4 py-4 text-center flex justify-center"><Avatar className="w-20 h-20">
+                                    <AvatarImage src={user?.image_url || 'Not Updated'} className="object-cover object-center w-20 h-20 rounded-full" />
+                                    <AvatarFallback>P</AvatarFallback>
+                                </Avatar></td>
+                                <td className="border border-gray-300 px-4 py-4 text-center">{user._id}</td> {/* Display Username */}
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.username || "Not Updated"}</td> {/* Display Username */}
                                 <td className="border border-gray-300 px-4 py-4 text-center">{user.role}</td>
                                 <td
