@@ -6,7 +6,7 @@
 
 import {  useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -90,19 +90,20 @@ export default function SignInPage() {
         ) : ""}
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         <Card className="w-full p-8 flex mx-auto flex-col justify-center items-center ">
-          <CardHeader>
-            <CardTitle>Login Into Account</CardTitle>
+          <CardHeader className="w-full">
+            <CardTitle>Signup</CardTitle>
+            <CardDescription>Create Your Admin Account</CardDescription>
           </CardHeader>
-          <form onSubmit={onSignIn}>
-            <CardContent>
+            <CardContent className="w-full">
+          <form onSubmit={onSignIn} className="flex flex-col gap-4 w-full">
               <Input
                 placeholder="Email"
                 type="email"
                 value={user.email}
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
               />
-            </CardContent>
-            <CardContent>
+            
+            
               <div className="flex justify-between relative"> {/* Wrapper to position the toggle icon */}
                 <Input
                   placeholder="Password"
@@ -121,8 +122,8 @@ export default function SignInPage() {
                   {showPassword ? <Eye /> : <EyeOff />} {/* Change icon based on state */}
                 </button>
               </div>
-            </CardContent>
-            <CardContent>
+              
+            
               <Button
                 className="w-full"
                 type="submit"
@@ -130,15 +131,15 @@ export default function SignInPage() {
                 
               >Signup
               </Button>
-            </CardContent>
            
           </form>
+          </CardContent>
           <Separator />
           <CardFooter className="mt-4 flex gap-3">
 
             <p>Already have an account? </p>
             <Link
-              className="text-blue-500 hover:text-gray-900 duration-500"
+              className="text-blue-500 underline hover:text-gray-900 duration-500"
               href="/"
             >
               Login here.

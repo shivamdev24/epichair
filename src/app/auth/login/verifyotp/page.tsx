@@ -201,19 +201,17 @@ loading={loading}
                     <CardHeader>
                         <CardTitle>Verify OTP</CardTitle>
                     </CardHeader>
-                    <form onSubmit={onVerifyOtp}>
-                        <CardContent>
+                    <CardContent className="w-full">
+                    <form onSubmit={onVerifyOtp} className="w-full">
                             <Input placeholder="Email" type="email" value={email || ""} disabled />
-                        </CardContent>
-                        <CardContent>
+                      
                             <Input placeholder="Enter OTP" type="text" value={otp} onChange={(e) => setOtp(e.target.value)} maxLength={6} />
-                        </CardContent>
-                        <CardContent>
+                       
                             <Button className="w-full" type="submit" disabled={buttonDisabled}>
                                 {buttonDisabled ? "Enter OTP" : "Verify OTP"}
                             </Button>
-                        </CardContent>
                     </form>
+                        </CardContent>
                 </Card>
             )}
         </div>

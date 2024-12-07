@@ -172,7 +172,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -278,19 +278,19 @@ export default function SignInPage() {
         ) : ""}
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         <Card className="w-full p-8 flex mx-auto flex-col justify-center items-center ">
-          <CardHeader>
-            <CardTitle>Login Into Account</CardTitle>
+          <CardHeader className="w-full">
+            <CardTitle>Login</CardTitle>
+            <CardDescription>Login Into Your Admin Account</CardDescription>
           </CardHeader>
-          <form onSubmit={onSignIn}>
-            <CardContent>
+          <CardContent className="w-full">
+            <form onSubmit={onSignIn} className="w-full flex flex-col gap-4">
               <Input
                 placeholder="Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </CardContent>
-            <CardContent >
+              
               <div className="flex justify-between relative">
                 <Input
                   placeholder="Password"
@@ -307,8 +307,6 @@ export default function SignInPage() {
                   {showPassword ? <Eye /> : <EyeOff />}
                 </button>
              </div>
-            </CardContent>
-            <CardContent>
               <Button
                 className="w-full"
                 type="submit"
@@ -316,22 +314,22 @@ export default function SignInPage() {
               >
                 {buttonDisabled.login ? "Required Field" : "Login"}
               </Button>
-            </CardContent>
           </form>
-          <CardContent>
+            </CardContent>
+            <Separator />
+          <CardContent className="w-full mt-4">
             <Button
               disabled={buttonDisabled.otp}
-              className="w-full"
+              className="w-full bg-blue-500"
               onClick={onOtpLogin}
             >
               {buttonDisabled.otp ? "Required Field" : "Login With OTP"}
             </Button>
           </CardContent>
-          <Separator />
           <CardFooter className="mt-4 flex gap-3">
             <p>Don&apos;t have an account? </p>
             <Link
-              className="text-blue-500 hover:text-gray-900 duration-500"
+              className="text-blue-500 underline hover:text-gray-900 duration-500"
               href="/auth/signup"
             >
               Signup here.
