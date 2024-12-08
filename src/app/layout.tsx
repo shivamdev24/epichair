@@ -14,10 +14,11 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "EpicHair - Admin Panel",
-  description: "",
+  title: "EpicHair - Professional Haircare and Grooming Services",
+  description: "Discover EpicHair Salon, your go-to destination for expert haircuts, styling, coloring, and grooming. Book an appointment today for a personalized haircare experience tailored to your unique needs.",
+  keywords: "EpicHair, haircuts, haircare, grooming, hair styling, hair coloring, professional salon, personalized haircare",
+  viewport: "width=device-width, initial-scale=1.0",
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{
